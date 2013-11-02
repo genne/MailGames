@@ -1,0 +1,21 @@
+﻿@model MailGames.Models.IndexHomeViewModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Hello, @Model.UserName!</h1>
+    <p>Welcome to Mail Games!</p>
+    <p>
+        <a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Chess")">Start new chess game »</a>
+    </p>
+</div>
+
+<h2>Your turn</h2>
+@Html.Partial("_GameList", Model.YourTurnGames)
+
+<h2>Opponents turn</h2>
+@Html.Partial("_GameList", Model.OpponentTurnGames)
+
+<h2>Finished games</h2>
+@Html.Partial("_GameList", Model.FinishedGames)

@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewBag.Title - Mail Games by Christian Genne</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        @Styles.Render("~/Content/bootstrap/base")
+        <link href="/Content/less/site.less" rel="stylesheet"/>
+    </head>
+    <body>
+        <div class="navbar navbar-inverse">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">Mail Games</a>
+                </div>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li class=""><a href="@Url.Action("Index", "Chess")">New Chess Game</a></li>
+                            <li class="">
+                                            <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.nav-collapse -->
+                }
+            </div>
+        </div>
+        <div id="wrap">
+            <div class="container">
+                @RenderBody()
+            </div>
+        </div>
+        
+        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new {id = "logoutForm"}))
+        {
+            @Html.AntiForgeryToken()
+        }
+        
+        @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+    </body>
+</html>

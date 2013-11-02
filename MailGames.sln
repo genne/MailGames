@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailGames", "MailGames\MailGames.csproj", "{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessTests", "ChessTests\ChessTests.csproj", "{B57A9F15-BEF9-45FC-B2CA-4D38136E674D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess", "Chess\Chess.csproj", "{59A497CF-3040-4285-9B13-55579E47B957}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B57A9F15-BEF9-45FC-B2CA-4D38136E674D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B57A9F15-BEF9-45FC-B2CA-4D38136E674D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B57A9F15-BEF9-45FC-B2CA-4D38136E674D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B57A9F15-BEF9-45FC-B2CA-4D38136E674D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59A497CF-3040-4285-9B13-55579E47B957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59A497CF-3040-4285-9B13-55579E47B957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59A497CF-3040-4285-9B13-55579E47B957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59A497CF-3040-4285-9B13-55579E47B957}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

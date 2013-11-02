@@ -1,0 +1,17 @@
+﻿@using MailGames.Models
+@model ChessGameViewModel
+@{
+    ViewBag.Title = "Chess";
+}
+
+<h1>Chess</h1>
+<h3><span class="label label-@(Model.Board.CurrentColor == Model.Board.PlayerColor ? "success" : "warning")">@(Model.Board.CurrentColor == Model.Board.PlayerColor ? "Your turn!" : "Waiting for opponent...")</span>
+<small><b>You:</b> @Model.YourMail
+<b>Opponent:</b> @Model.OpponentMail</small>
+    </h3>
+@Html.Partial("_Board", Model.Board)
+
+@section scripts
+{
+    <script src="/Scripts/chess.js"></script>
+}

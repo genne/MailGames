@@ -1,0 +1,85 @@
+﻿@using Chess
+@using MailGames.Chess
+@using MailGames.Controllers
+@using MailGames.Models
+@model MailGames.Models.ChessBoardViewModel
+
+@{
+    var dontRotateBoard = Model.PlayerColor == PieceColor.White;
+}
+
+<table class="chess-table" data-board="@Model.Id">
+    @for (var origRow = 0; origRow < 8; origRow++ )
+    {
+        var row = dontRotateBoard ? origRow : 7 - origRow;
+        <tr>
+            @for (var origCol = 0; origCol < 8; origCol++)
+            {
+                var col = dontRotateBoard ? origCol : 7 - origCol;
+                var cellColor = (row + col) % 2 == 0 ? "white" : "black";
+                var cell = Model.Cells[col, row];
+                <td class="cell-@cellColor" data-cell="@(new Position{ Col = col, Row = row}.ToInt())">
+                    @if (cell != null)
+                    {
+                        <b class="
+                            piece 
+                            piece-@cell.PieceType.ToString().ToLower() 
+                            piece-color-@cell.PieceColor.ToString().ToLower()
+                            @(Model.PlayerColor == Model.CurrentColor && Model.CurrentColor == cell.PieceColor ? "selectable" : "")
+                            @(cell.PieceType == PieceType.Pawn && origRow==1 ? "code-upgrade-pawn" : "")
+                            "></b>
+                    }
+                </td>
+            }
+        </tr>
+    }
+</table>
+
+@if (Model.CurrentColor == Model.PlayerColor)
+{
+    <div class="">
+        <a class="" href="#surrender-modal" data-toggle="modal">Surrender</a>
+        <a href="#" class="btn btn-primary disabled code-move-button">Move</a>
+    </div>
+
+    <div class="modal fade" id="pawn-upgrade-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Select target piece</h4>
+                </div>
+                <div class="modal-body">
+                    @foreach (var pieceType in Enum.GetValues(typeof (PieceType)).OfType<PieceType>())
+                    {
+                        if (pieceType != PieceType.Pawn && pieceType != PieceType.King)
+                        {
+                            <button type="button" class="btn btn-primary btn-lg code-convert-pawn-button" data-piece-type="@pieceType"><b class="piece-@pieceType.ToString().ToLower()"></b></button>
+                        }
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="surrender-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Really surrender?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to surrender this game?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a href="@Url.Action("Surrender", new {Model.Id})" class="btn btn-warning">Surrender</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
