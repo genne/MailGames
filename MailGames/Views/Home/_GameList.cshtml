@@ -1,0 +1,6 @@
+﻿@model IEnumerable<MailGames.Models.IndexHomeViewModel.Game>
+
+@foreach (var activeGame in Model)
+{
+    <a class="btn btn-info btn-block" href="@Url.Action("Game", "Chess", new{ id = activeGame.Id })">Chess against @activeGame.OpponentName</a>
+}

@@ -103,6 +103,8 @@ namespace MailGames.Controllers
         {
             var db = new MailGamesContext();
             var boardObj = db.ChessBoards.Find(board);
+            var whitePlayer = boardObj.WhitePlayer;
+            var blackPlayer = boardObj.BlackPlayer;
             EnsurePlayersTurn(boardObj);
             var currentState = ChessConversion.GetCurrentState(boardObj);
             var currentColor = currentState.CurrentColor;

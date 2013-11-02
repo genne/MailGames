@@ -11,11 +11,19 @@
     </p>
 </div>
 
-<h2>Your turn</h2>
-@Html.Partial("_GameList", Model.YourTurnGames)
+<div class="row">
+    <div class="col-md-4">
+    <h2>Your turn</h2>
+    @Html.Partial("_GameList", Model.YourTurnGames)
+    </div>
 
-<h2>Opponents turn</h2>
-@Html.Partial("_GameList", Model.OpponentTurnGames)
+    <div class="col-md-4">
+    <h2>Opponents turn</h2>
+    @Html.Partial("_GameList", Model.OpponentTurnGames)
+    </div>
 
-<h2>Finished games</h2>
-@Html.Partial("_GameList", Model.FinishedGames)
+    <div class="col-md-4">
+    <h2>Finished games</h2>
+    @Html.Partial("_GameList", Model.FinishedGames)
+    </div>
+</div>
