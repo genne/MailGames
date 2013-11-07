@@ -1,39 +1,47 @@
-﻿@font-face {
+﻿.tic-tac-toe-table {
+  margin-bottom: 10px;
+}
+.tic-tac-toe-table td {
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+  font-size: 50px;
+  text-align: center;
+  vertical-align: middle;
+}
+.tic-tac-toe-table td a {
+  display: block;
+  height: 100%;
+}
+@font-face {
   font-family: 'Chess';
   src: url('/content/fonts/CASEFONT.TTF');
 }
 .piece {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
 }
 .piece-pawn:after {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
   content: 'p';
 }
 .piece-knight:after {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
   content: 'n';
 }
 .piece-bishop:after {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
   content: 'b';
 }
 .piece-rook:after {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
   content: 'r';
 }
 .piece-queen:after {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
   content: 'q';
 }
 .piece-king:after {
   font-family: Chess;
-  text-shadow: 0px 0px 20px black;
   content: 'k';
 }
 .piece-color-black {
@@ -44,6 +52,9 @@
 }
 .chess-table {
   margin-bottom: 20px;
+}
+.chess-table .piece {
+  text-shadow: 0px 0px 20px black;
 }
 .chess-table td {
   width: 35px;
@@ -78,10 +89,18 @@
 .chess-table td.selected-target {
   background: lightgreen;
 }
-#footer {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  height: 60px;
-  background-color: #f5f5f5;
+.game-list a {
+  text-align: left;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.game-list b {
+  font-size: 30px;
+  margin-right: 10px;
+  float: left;
+}
+.game-list .last-played {
+  color: #cdcdcd;
+  font-style: italic;
+  text-align: right;
 }

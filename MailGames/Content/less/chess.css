@@ -1,0 +1,120 @@
+﻿@font-face {
+  font-family: 'Chess';
+  src: url('/content/fonts/CASEFONT.TTF');
+}
+.piece {
+  font-family: Chess;
+}
+.piece-pawn:after {
+  font-family: Chess;
+  content: 'o';
+}
+.piece-knight:after {
+  font-family: Chess;
+  content: 'm';
+}
+.piece-bishop:after {
+  font-family: Chess;
+  content: 'v';
+}
+.piece-rook:after {
+  font-family: Chess;
+  content: 't';
+}
+.piece-queen:after {
+  font-family: Chess;
+  content: 'w';
+}
+.piece-king:after {
+  font-family: Chess;
+  content: 'l';
+}
+.piece-color-black {
+  color: black;
+}
+.piece-color-white {
+  color: white;
+  text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+}
+.chess-table {
+  margin-bottom: 20px;
+}
+.chess-table td {
+  width: 35px;
+  height: 35px;
+  border: 1px solid black;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0px;
+}
+.chess-table td .piece {
+  font-size: 23.333333333333332px;
+}
+.chess-table td .piece.selectable {
+  cursor: pointer;
+}
+.chess-table td .piece.selectable:hover {
+  font-size: 23.333333333333332px;
+}
+.chess-table td .piece.selectable.selected {
+  font-size: 23.333333333333332px;
+}
+.chess-table td.cell-white {
+  background-color: lightgrey;
+}
+.chess-table td.cell-black {
+  background-color: darkgrey;
+}
+.chess-table td.available-target {
+  background: lightblue;
+  cursor: pointer;
+}
+.chess-table td.selected-target {
+  background: lightgreen;
+}
+@media (min-width: 768px) {
+  .chess-table {
+    margin-bottom: 20px;
+  }
+  .chess-table td {
+    width: 70px;
+    height: 70px;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0px;
+  }
+  .chess-table td .piece {
+    font-size: 46.666666666666664px;
+  }
+  .chess-table td .piece.selectable {
+    cursor: pointer;
+  }
+  .chess-table td .piece.selectable:hover {
+    font-size: 46.666666666666664px;
+  }
+  .chess-table td .piece.selectable.selected {
+    font-size: 46.666666666666664px;
+  }
+  .chess-table td.cell-white {
+    background-color: lightgrey;
+  }
+  .chess-table td.cell-black {
+    background-color: darkgrey;
+  }
+  .chess-table td.available-target {
+    background: lightblue;
+    cursor: pointer;
+  }
+  .chess-table td.selected-target {
+    background: lightgreen;
+  }
+}
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  
+}
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  
+}

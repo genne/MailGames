@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameBase;
 using MailGames.Chess;
 
 namespace Chess
@@ -279,6 +280,7 @@ namespace Chess
             }
             state.SetCell(to, piece);
             state.SetCell(@from, null);
+            state.AddMove(piece, from, to);
             state.MarkAsMoved(to);
         }
 
@@ -302,6 +304,20 @@ namespace Chess
             if (isCheck && !canMove) return ChessRunningState.CheckMate;
             if (!canMove) return ChessRunningState.StaleMate;
             return ChessRunningState.Nothing;
+        }
+
+        public static GameState GetGameState(ChessRunningState state, PieceColor currentPlayer, PieceColor loggedInPlayer)
+        {
+            if (state == ChessRunningState.CheckMate)
+            {
+                if (currentPlayer == loggedInPlayer)
+                    return GameState.PlayerWon;
+                return GameState.OpponentWon;
+            }
+            if (state == ChessRunningState.StaleMate)
+                return GameState.Tie;
+            if (currentPlayer == loggedInPlayer) return GameState.YourTurn;
+            return GameState.OpponentsTurn;
         }
     }
 

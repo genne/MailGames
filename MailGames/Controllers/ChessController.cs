@@ -2,7 +2,6 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -15,31 +14,12 @@ using WebMatrix.WebData;
 
 namespace MailGames.Controllers
 {
+    [Authorize]
     [InitializeSimpleMembership]
-    public class ChessController : Controller
+    public class ChessController : GameControllerBase
     {
         //
         // GET: /Chess/
-
-        [Authorize]
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        [Authorize]
-        public ActionResult StartGame(string opponentsmail)
-        {
-            var db = new MailGamesContext();
-            var board = db.ChessBoards.Create();
-            board.Id = Guid.NewGuid();
-            string yourmail = PlayerManager.GetCurrent(db).Mail;
-            board.WhitePlayer = FindOrCreatePlayer(yourmail, db);
-            board.BlackPlayer = FindOrCreatePlayer(opponentsmail, db);
-            db.ChessBoards.Add(board);
-            db.SaveChanges();
-            return RedirectToAction("Game", new {id = board.Id, player = board.WhitePlayer.Guid });
-        }
 
         private ChessBoardViewModel GetBoardViewModel(ChessBoard board)
         {
@@ -47,7 +27,7 @@ namespace MailGames.Controllers
             var model = new ChessBoardViewModel();
             model.Id = board.Id;
             model.CurrentColor = state.CurrentColor;
-            model.PlayerColor = board.WhitePlayer.Id == WebSecurity.CurrentUserId ? PieceColor.White : PieceColor.Black;
+            model.PlayerColor = board.FirstPlayer.Id == WebSecurity.CurrentUserId ? PieceColor.White : PieceColor.Black;
             model.Cells = new Piece[8,8];
             foreach(var cellState in state.GetCells())
             {
@@ -55,19 +35,6 @@ namespace MailGames.Controllers
                 model.Cells[pos.Col, pos.Row] = cellState.Value;
             }
             return model;
-        }
-
-        private static Player FindOrCreatePlayer(string yourmail, MailGamesContext db)
-        {
-            var player = db.Players.FirstOrDefault(p => p.Mail == yourmail);
-            if (player == null)
-            {
-                player = db.Players.Create();
-                player.Mail = yourmail;
-                player.Guid = Guid.NewGuid();
-                db.Players.Add(player);
-            }
-            return player;
         }
 
         [Authorize]
@@ -79,32 +46,27 @@ namespace MailGames.Controllers
             return Json(availableCells);
         }
 
-        public ActionResult Game(Guid id, Guid? player)
+        public ActionResult Game(Guid id)
         {
             var db = new MailGamesContext();
-            if (player.HasValue)
-            {
-                var userName = db.Players.Single(p => p.Guid == player.Value).UserName;
-                FormsAuthentication.SetAuthCookie(userName, false);
-                return RedirectToAction("Game", new {id}); // Reload this action, but now logged in
-            }
             if (!WebSecurity.IsAuthenticated) throw new ValidationException("Not logged in");
             ChessBoard board = db.ChessBoards.Find(id);
+            var state = ChessConversion.GetCurrentState(board);
             return View(new ChessGameViewModel
             {
                 Board = GetBoardViewModel(board),
-                YourMail = db.Players.Single(p => p.Id == WebSecurity.CurrentUserId).Mail,
-                OpponentMail = board.WhitePlayer.Id == WebSecurity.CurrentUserId ? board.BlackPlayer.Mail : board.WhitePlayer.Mail
+                State = ChessLogic.GetGameState(board.RunningState, GetCurrentPlayer(board), GetLoggedInPlayer(board)),
+                GameType = GameType.Chess,
+                IsCheck = board.RunningState == ChessRunningState.Check,
+                CapturedPieces = state.CapturedPieces,
+                Moves = state.Moves
             });
         }
 
-        [Authorize]
         public ActionResult Move(Guid board, int from, int to, PieceType? convertPawnTo)
         {
             var db = new MailGamesContext();
             var boardObj = db.ChessBoards.Find(board);
-            var whitePlayer = boardObj.WhitePlayer;
-            var blackPlayer = boardObj.BlackPlayer;
             EnsurePlayersTurn(boardObj);
             var currentState = ChessConversion.GetCurrentState(boardObj);
             var currentColor = currentState.CurrentColor;
@@ -114,7 +76,8 @@ namespace MailGames.Controllers
             {
                 From = from,
                 To = to,
-                PawnConversion = convertPawnTo.HasValue ? new[]{ new PawnConversion{ ConvertTo = convertPawnTo.Value }} : null
+                PawnConversion = convertPawnTo.HasValue ? new[]{ new PawnConversion{ ConvertTo = convertPawnTo.Value }} : null,
+                DateTime = DateTime.Now
             });
 
             boardObj.RunningState = ChessLogic.GetRunningState(currentState);
@@ -126,30 +89,33 @@ namespace MailGames.Controllers
             db.SaveChanges();
 
             if (boardObj.RunningState == ChessRunningState.CheckMate)
-                SendMail(board, db, boardObj, "It's your turn! Click here: ", "Your turn!");
+                SendMail(db, boardObj, "You lost the game :(", "Checkmate :(");
+            else if (boardObj.RunningState == ChessRunningState.StaleMate)
+                SendMail(db, boardObj, "You lost the game :(", "Stalemate");
+            else if (boardObj.RunningState == ChessRunningState.Check)
+                SendMail(db, boardObj, "The opponent made a move and put you in check. Make your move!", "Check :/");
             else
-            {
-                SendMail(board, db, boardObj, "You lost the game :(\r\n\r\n", "Checkmate");
-            }
+                SendMail(db, boardObj, "It's your turn!", "Your turn!");
 
             return RedirectToAction("Game", new {id = board});
-        }
-
-        private void SendMail(Guid board, MailGamesContext db, ChessBoard boardObj, string message, string topic)
-        {
-            var mail = PlayerManager.GetCurrent(db).Mail;
-            var otherPlayer = boardObj.WhitePlayer.Id == WebSecurity.CurrentUserId ? boardObj.BlackPlayer : boardObj.WhitePlayer;
-            string url = Url.Action("Game", null, new {id = board, player = otherPlayer.Guid}, Request.Url.Scheme);
-            string body = message + url;
-            new SmtpClient().Send(mail, otherPlayer.Mail, "Mail Chess - " + topic, body);
         }
 
         private void EnsurePlayersTurn(ChessBoard boardObj)
         {
             if (boardObj.Winner.HasValue) throw new ValidationException("Game over");
-            var currentPlayer = boardObj.ChessMoves.Count()%2 == 0 ? PieceColor.White : PieceColor.Black;
-            var loggedInPlayer = boardObj.WhitePlayer.Id == WebSecurity.CurrentUserId ? PieceColor.White : PieceColor.Black;
+            var currentPlayer = GetCurrentPlayer(boardObj);
+            var loggedInPlayer = GetLoggedInPlayer(boardObj);
             if (currentPlayer != loggedInPlayer) throw new ValidationException("Not your turn");
+        }
+
+        private static PieceColor GetLoggedInPlayer(ChessBoard boardObj)
+        {
+            return boardObj.FirstPlayer.Id == WebSecurity.CurrentUserId ? PieceColor.White : PieceColor.Black;
+        }
+
+        private static PieceColor GetCurrentPlayer(ChessBoard boardObj)
+        {
+            return boardObj.ChessMoves.Count()%2 == 0 ? PieceColor.White : PieceColor.Black;
         }
 
         public ActionResult Surrender(Guid id)
@@ -162,17 +128,9 @@ namespace MailGames.Controllers
             board.Winner = ChessLogic.GetNextColor(state.CurrentColor);
             db.SaveChanges();
 
-            SendMail(id, db, board, "You won the game, congratulations!\r\n\r", "Opponent resigned");
+            SendMail(db, board, "You won the game, congratulations!", "Opponent resigned");
 
             return RedirectToAction("Game", new {id});
-        }
-    }
-
-    public class PlayerManager
-    {
-        public static Player GetCurrent(MailGamesContext db)
-        {
-            return db.Players.Single(p => p.Id == WebSecurity.CurrentUserId);
         }
     }
 }

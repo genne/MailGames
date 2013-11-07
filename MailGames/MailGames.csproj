@@ -211,6 +211,24 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\less\chess.css">
+      <DependentUpon>chess.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\chess.min.css">
+      <DependentUpon>chess.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\colors.css">
+      <DependentUpon>colors.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\colors.min.css">
+      <DependentUpon>colors.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of tictactoe.css">
+      <DependentUpon>chess.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of tictactoe.min.css">
+      <DependentUpon>chess.less</DependentUpon>
+    </Content>
     <Content Include="Content\less\site.css">
       <DependentUpon>site.less</DependentUpon>
     </Content>
@@ -219,10 +237,34 @@
     <Compile Include="Context\ChessBoard.cs" />
     <Compile Include="Context\ChessMove.cs" />
     <Compile Include="Context\Player.cs" />
+    <Compile Include="Context\TicTacToeBoard.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ChessController.cs" />
     <Compile Include="Context\MailGamesContext.cs" />
+    <Compile Include="Controllers\GameBoardInfo.cs" />
+    <Compile Include="Controllers\GameControllerBase.cs" />
+    <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PlayerManager.cs" />
+    <Compile Include="Controllers\TicTacToeController.cs" />
+    <Compile Include="Migrations\201311031052188_TicTacToeMigration.cs" />
+    <Compile Include="Migrations\201311031052188_TicTacToeMigration.Designer.cs">
+      <DependentUpon>201311031052188_TicTacToeMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311031529057_TicTacToeWinner.cs" />
+    <Compile Include="Migrations\201311031529057_TicTacToeWinner.Designer.cs">
+      <DependentUpon>201311031529057_TicTacToeWinner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311031606036_TicTacToeWinner1.cs" />
+    <Compile Include="Migrations\201311031606036_TicTacToeWinner1.Designer.cs">
+      <DependentUpon>201311031606036_TicTacToeWinner1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311031858142_MovesDateTime.cs" />
+    <Compile Include="Migrations\201311031858142_MovesDateTime.Designer.cs">
+      <DependentUpon>201311031858142_MovesDateTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GameTicTacToeViewModel.cs" />
+    <Compile Include="TicTacToeConversion.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -248,8 +290,25 @@
     <Content Include="Content\less\site.min.css">
       <DependentUpon>site.less</DependentUpon>
     </Content>
+    <Content Include="Content\less\tictactoe.css">
+      <DependentUpon>tictactoe.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\tictactoe.min.css">
+      <DependentUpon>tictactoe.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\variables.css">
+      <DependentUpon>variables.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\variables.min.css">
+      <DependentUpon>variables.less</DependentUpon>
+    </Content>
     <Content Include="Scripts\chess.js" />
-    <Content Include="Scripts\site.js" />
+    <Content Include="Views\Shared\_Game.cshtml" />
+    <TypeScriptCompile Include="Scripts\site.ts" />
+    <Content Include="Content\less\tictactoe.less" />
+    <Content Include="Content\less\chess.less" />
+    <Content Include="Content\less\colors.less" />
+    <Content Include="Content\less\variables.less" />
     <None Include="Properties\PublishProfiles\mailgames - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mailgames - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
@@ -259,12 +318,15 @@
     <Content Include="Scripts\jquery-2.0.3.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\site.js" />
     <Content Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <Content Include="Scripts\typings\jquery\jquery.d.ts" />
     <Content Include="Views\Chess\Index.cshtml" />
     <Content Include="Views\Chess\Game.cshtml" />
     <Content Include="Views\Chess\_Board.cshtml" />
     <Content Include="Views\Home\_GameList.cshtml" />
+    <Content Include="Views\TicTacToe\Game.cshtml" />
+    <Content Include="Views\Home\StartGame.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -392,6 +454,14 @@
       <Project>{59A497CF-3040-4285-9B13-55579E47B957}</Project>
       <Name>Chess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GameBase\GameBase.csproj">
+      <Project>{93D3A47B-BAF9-4886-878F-1B34C5EC31AA}</Project>
+      <Name>GameBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TicTacToe\TicTacToe.csproj">
+      <Project>{5FAE11F4-6467-49A6-AA45-30FAE05983F5}</Project>
+      <Name>TicTacToe</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201310281242089_initial.resx">
@@ -402,6 +472,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311011142421_ChessWinnerr.resx">
       <DependentUpon>201311011142421_ChessWinnerr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311031052188_TicTacToeMigration.resx">
+      <DependentUpon>201311031052188_TicTacToeMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311031529057_TicTacToeWinner.resx">
+      <DependentUpon>201311031529057_TicTacToeWinner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311031606036_TicTacToeWinner1.resx">
+      <DependentUpon>201311031606036_TicTacToeWinner1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311031858142_MovesDateTime.resx">
+      <DependentUpon>201311031858142_MovesDateTime.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

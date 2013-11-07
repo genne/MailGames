@@ -9,15 +9,23 @@ namespace Chess
         private Dictionary<int,Piece> Cells { get; set; }
         public PieceColor CurrentColor { get; set; }
 
+        public List<Piece> CapturedPieces { get; set; }
+
+        public LinkedList<PieceMove> Moves { get; set; }
+
         public ChessState()
         {
             Cells = new Dictionary<int, Piece>();
+            CapturedPieces= new List<Piece>();
+            Moves = new LinkedList<PieceMove>();
         }
 
         public ChessState(ChessState state)
         {
             Cells = new Dictionary<int, Piece>(state.Cells);
             CurrentColor = state.CurrentColor;
+            CapturedPieces = new List<Piece>(state.CapturedPieces);
+            Moves = new LinkedList<PieceMove>(state.Moves);
         }
 
         public Piece GetCell(int cell)
@@ -32,6 +40,11 @@ namespace Chess
 
         public void SetCell(int cell, Piece piece)
         {
+            var capturedPiece = GetCell(cell);
+            if (capturedPiece != null)
+            {
+                CapturedPieces.Add(capturedPiece);
+            }
             if (piece == null) Cells.Remove(cell);
             else Cells[cell] = piece;
         }
@@ -53,7 +66,12 @@ namespace Chess
 
         public void SetCell(int row, int col, PieceColor pieceColor, PieceType pieceType)
         {
-            SetCell(new Position{ Row = row, Col = col}.ToInt(), new Piece{ PieceColor = pieceColor, PieceType = pieceType});
+            SetCell(new Position {Row = row, Col = col}.ToInt(), new Piece{ PieceColor = pieceColor, PieceType = pieceType});
+        }
+
+        public void AddMove(Piece piece, int @from, int to)
+        {
+            Moves.AddFirst(new PieceMove{ Piece = piece, From = Position.FromInt(from), To = Position.FromInt(to)});
         }
     }
 

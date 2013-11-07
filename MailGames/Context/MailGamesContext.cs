@@ -8,10 +8,12 @@ namespace MailGames.Context
 
         public IDbSet<Player> Players { get; set; }
 
+        public IDbSet<TicTacToeBoard> TicTacToeBoards { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ChessBoard>().HasRequired(b => b.WhitePlayer).WithMany().WillCascadeOnDelete(false);
-            modelBuilder.Entity<ChessBoard>().HasRequired(b => b.BlackPlayer).WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<ChessBoard>().HasRequired(b => b.FirstPlayer).WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<ChessBoard>().HasRequired(b => b.SecondPlayer).WithMany().WillCascadeOnDelete(false);
             base.OnModelCreating(modelBuilder);
         }
     }

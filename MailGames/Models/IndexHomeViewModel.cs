@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using MailGames.Controllers;
 
 namespace MailGames.Models
 {
@@ -14,8 +15,11 @@ namespace MailGames.Models
 
         public class Game
         {
+            public GameType GameType { get; set; }
             public string OpponentName { get; set; }
             public Guid Id { get; set; }
+
+            public DateTime? LastActive { get; set; }
         }
     }
 }

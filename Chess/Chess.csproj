@@ -40,10 +40,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChessLogic.cs" />
+    <Compile Include="ChessMove.cs" />
     <Compile Include="ChessState.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameBase\GameBase.csproj">
+      <Project>{93D3A47B-BAF9-4886-878F-1B34C5EC31AA}</Project>
+      <Name>GameBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

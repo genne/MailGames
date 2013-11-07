@@ -453,5 +453,20 @@ namespace MailGames.Controllers
             }
         }
         #endregion
+
+        public ActionResult LoginUsingGuid(Guid guid, string redirectto)
+        {
+            var db = new MailGamesContext();
+            var playerDb = db.Players.Single(p => p.Guid == guid);
+            var userName = playerDb.UserName;
+            if (userName == null)
+            {
+                playerDb.UserName = playerDb.Mail;
+                userName = playerDb.UserName;
+                db.SaveChanges();
+            }
+            FormsAuthentication.SetAuthCookie(userName, false);
+            return RedirectToLocal(redirectto);
+        }
     }
 }

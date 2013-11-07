@@ -1,15 +1,56 @@
-﻿@using MailGames.Models
+﻿@using Chess
+@using MailGames.Models
 @model ChessGameViewModel
 @{
-    ViewBag.Title = "Chess";
+    Layout = "~/Views/Shared/_Game.cshtml";
 }
 
-<h1>Chess</h1>
-<h3><span class="label label-@(Model.Board.CurrentColor == Model.Board.PlayerColor ? "success" : "warning")">@(Model.Board.CurrentColor == Model.Board.PlayerColor ? "Your turn!" : "Waiting for opponent...")</span>
-<small><b>You:</b> @Model.YourMail
-<b>Opponent:</b> @Model.OpponentMail</small>
-    </h3>
+    @if (Model.IsCheck)
+    {
+        <span class="label label-warning">Check</span>
+    }
+
 @Html.Partial("_Board", Model.Board)
+
+@section moves
+{
+    <h2>Captured pieces</h2>
+    @if (Model.CapturedPieces.Any())
+    {
+        foreach (var capturedPiece in Model.CapturedPieces)
+        {
+            <b class="
+                            piece 
+                            piece-@capturedPiece.PieceType.ToString().ToLower() 
+                            piece-color-@capturedPiece.PieceColor.ToString().ToLower()
+                            "></b>
+        }
+    }
+    else
+    {
+        <i>No pieces has been captured yet...</i>
+    }
+    
+    <h2>Moves</h2>
+    <table class="table">
+        <thead><tr><th>Piece</th><th>From</th><th>To</th></tr></thead>
+        @foreach (var move in Model.Moves)
+        {
+            <tr>
+                <td>
+                    <b class="
+                            piece 
+                            piece-@move.Piece.PieceType.ToString().ToLower() 
+                            piece-color-@move.Piece.PieceColor.ToString().ToLower()
+                            "></b>
+
+                </td>
+                <td>@move.From</td>
+                <td>@move.To</td>
+            </tr>
+        }
+    </table>
+}
 
 @section scripts
 {

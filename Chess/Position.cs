@@ -1,4 +1,6 @@
-﻿namespace MailGames.Chess
+﻿using System.Globalization;
+
+namespace MailGames.Chess
 {
     public class Position
     {
@@ -44,6 +46,11 @@
         public static Position FromInt(int sourceCell)
         {
             return new Position { Col = sourceCell / 10, Row = sourceCell % 10 };
+        }
+
+        public override string ToString()
+        {
+            return "abcdefgh"[Col] + (Row + 1).ToString(CultureInfo.InvariantCulture);
         }
     }
 }

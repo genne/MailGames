@@ -1,6 +1,12 @@
 ﻿@model IEnumerable<MailGames.Models.IndexHomeViewModel.Game>
 
+<div class="game-list">
 @foreach (var activeGame in Model)
 {
-    <a class="btn btn-info btn-block" href="@Url.Action("Game", "Chess", new{ id = activeGame.Id })">Chess against @activeGame.OpponentName</a>
+    <a class="btn btn-info btn-block" href="@Url.Action("Game", activeGame.GameType.ToString(), new{ id = activeGame.Id })">
+        <b class="piece piece-king"></b>
+        @activeGame.GameType against @activeGame.OpponentName
+        <div class="last-played code-nice-date">@activeGame.LastActive</div>
+    </a>
 }
+</div>

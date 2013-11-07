@@ -1,0 +1,47 @@
+﻿@using GameBase
+@using MailGames.Controllers
+@using MailGames.Models
+@model MailGames.Models.GameViewModel
+@{
+    ViewBag.Title = GameBoardInfo.GetName(Model.GameType);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@GameBoardInfo.GetName(Model.GameType)</h1>
+<div class="row">
+    <div class="col-md-6">
+        <h3>
+            @switch (Model.State)
+            {
+                case GameState.YourTurn:
+                    <span class="label label-info">Your turn</span>
+                    break;
+                case GameState.OpponentsTurn:
+                    <span class="label label-warning">Opponents turn</span>
+                    break;
+                case GameState.PlayerWon:
+                    <span class="label label-success">You won the game!</span>
+                    break;
+                case GameState.OpponentWon:
+                    <span class="label label-danger">You lost the game :(</span>
+                    break;
+                case GameState.Tie:
+                    <span class="label label-danger">It was a tie :(</span>
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        </h3>
+
+        @RenderBody()
+    </div>
+    
+    <div class="col-md-6">
+        @RenderSection("moves", false)
+    </div>
+</div>
+
+@section scripts
+{
+    @RenderSection("scripts", false);
+}

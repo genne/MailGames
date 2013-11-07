@@ -1,0 +1,120 @@
+﻿@import "variables.less";
+
+@font-face {
+  font-family: 'Chess';
+  src: url('/content/fonts/CASEFONT.TTF');
+}
+
+.piece {
+    font-family: Chess;
+}
+
+.piece-pawn:after {
+    .piece;
+    content: 'o';
+}
+
+.piece-knight:after {
+    .piece;
+    content: 'm';
+}
+
+.piece-bishop:after {
+    .piece;
+    content: 'v';
+}
+
+.piece-rook:after {
+    .piece;
+    content: 't';
+}
+
+.piece-queen:after {
+    .piece;
+    content: 'w';
+}
+
+.piece-king:after {
+    .piece;
+    content: 'l';
+}
+
+.piece-color-black {
+    color: black;
+    //text-shadow: 1px 0px 0px white 0px 1px 0px white;
+}
+.piece-color-white {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000; }
+
+
+.chess-table-base(@cellsize) {
+    margin-bottom: 20px;
+
+    td {
+        width: @cellsize;
+        height: @cellsize;
+        border: 1px solid black;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 0px;
+
+        .piece {
+            font-size: @cellsize / 1.5;
+
+            &.selectable {
+                cursor: pointer;
+
+                &:hover {
+                    font-size: @cellsize / 1.5;
+                }
+
+                &.selected {
+                    font-size: @cellsize / 1.5;
+                }
+            }
+        }
+
+        &.cell-white {
+            background-color: lightgrey;
+        }
+
+        &.cell-black {
+            background-color: darkgrey;
+        }
+
+        &.available-target {
+            background: lightblue;
+            cursor: pointer;
+        }
+
+        &.selected-target {
+            background: lightgreen;
+        }
+    }
+}
+
+.chess-table
+    {
+        .chess-table-base(35px);
+    }
+
+@media (min-width: @screen-sm-min) { 
+    .chess-table
+    {
+        .chess-table-base(70px);
+    }
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: @screen-md-min) { 
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: @screen-lg-min) { 
+}
+

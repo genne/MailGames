@@ -1,0 +1,21 @@
+﻿@using MailGames.Controllers
+@using MailGames.Models
+@{
+    ViewBag.Title = "Start new game";
+}
+
+<form action="@Url.Action("StartGame")" method="POST">
+    <div class="form-group">
+        <label for="gameType">Game type</label>
+        <select name="gameType" class="form-control">
+            <option value="@GameType.Chess">Chess</option>
+            <option value="@GameType.TicTacToe">Tic Tac Toe</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="opponentsmail">Opponents mail</label>
+        <input type="email" name="opponentsmail" class="form-control"/>
+    </div>
+    
+    <button class="btn btn-primary">Start game</button>
+</form>

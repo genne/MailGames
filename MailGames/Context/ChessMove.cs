@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Chess;
 
@@ -10,6 +11,8 @@ namespace MailGames.Context
         public int To { get; set; }
 
         public virtual ICollection<PawnConversion> PawnConversion { get; set; }
+
+        public DateTime DateTime { get; set; }
     }
 
     public class PawnConversion

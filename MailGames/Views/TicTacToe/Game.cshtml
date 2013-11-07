@@ -1,0 +1,33 @@
+﻿@using GameBase
+@using MailGames.Models
+@model MailGames.Models.GameTicTacToeViewModel
+@{
+    Layout = "/Shared/_Game.cshtml";
+}
+
+<table class="tic-tac-toe-table">
+    @for (int y = 0; y < 3; y++)
+    {
+        <tr>
+            @for (int x = 0; x < 3; x++)
+            {
+                var color = Model.Colors[x, y];
+                <td>
+                    @if (color.HasValue)
+                    {
+                        @color.Value
+                    }
+                    else if (Model.State == GameState.YourTurn)
+                    {
+                        <a href="@Url.Action("Select", new{ Model.Id, x, y})"></a>
+                    }
+                </td>
+            }
+        </tr>
+    }
+</table>
+
+@if (Model.GameOver)
+{
+    <a href="@Url.Action("Rematch", new{ Model.Id })" class="btn btn-primary btn-lg">Rematch</a>
+}
