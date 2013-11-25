@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Chess;
+using GameBase;
 
 namespace MailGames.Models
 {
@@ -11,10 +12,14 @@ namespace MailGames.Models
     {
         public Piece[,] Cells { get; set; }
 
-        public PieceColor CurrentColor { get; set; }
+        public GamePlayer CurrentColor { get; set; }
 
         public Guid Id { get; set; }
 
-        public PieceColor PlayerColor { get; set; }
+        public GamePlayer PlayerColor { get; set; }
+
+        public GamePlayer? AttackedKing { get; set; }
+
+        public IEnumerable<int> OpponentMoves { get; set; }
     }
 }

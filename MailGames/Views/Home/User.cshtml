@@ -1,0 +1,16 @@
+﻿@model MailGames.Models.UserHomeViewModel
+
+@{
+    ViewBag.Title = Model.Name;
+}
+
+<h2>@Model.Name</h2>
+
+@{
+    var showLogin = WebSecurity.CurrentUserName.StartsWith("genne");
+}
+
+@if (showLogin)
+{
+    <a href="@Url.Action("LoginUsingGuid", "Account", new{ Model.Guid })">Log in as</a>
+}

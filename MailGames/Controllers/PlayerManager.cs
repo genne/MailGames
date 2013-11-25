@@ -24,5 +24,24 @@ namespace MailGames.Controllers
             }
             return player;
         }
+
+        public static string GetOpponentName(IGameBoard board)
+        {
+            var opponentPlayer = GetOpponentPlayer(board);
+            return opponentPlayer.UserName ?? opponentPlayer.Mail;
+        }
+
+        private static Player GetOpponentPlayer(IGameBoard board)
+        {
+            var opponentPlayer = board.FirstPlayer.Id == WebSecurity.CurrentUserId
+                                     ? board.SecondPlayer
+                                     : board.FirstPlayer;
+            return opponentPlayer;
+        }
+
+        public static int GetOpponentId(IGameBoard board)
+        {
+            return GetOpponentPlayer(board).Id;
+        }
     }
 }

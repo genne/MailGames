@@ -1,11 +1,12 @@
-﻿@model IEnumerable<MailGames.Models.IndexHomeViewModel.Game>
+﻿@using MailGames.Logic
+@model IEnumerable<MailGames.Models.IndexHomeViewModel.Game>
 
 <div class="game-list">
 @foreach (var activeGame in Model)
 {
-    <a class="btn btn-info btn-block" href="@Url.Action("Game", activeGame.GameType.ToString(), new{ id = activeGame.Id })">
-        <b class="piece piece-king"></b>
-        @activeGame.GameType against @activeGame.OpponentName
+    <a class="btn btn-primary btn-block" href="@Url.Action("Game", GameLogic.GetController(activeGame.GameType), new{ id = activeGame.Id })">
+        <b class="icon-game-@activeGame.GameType.ToString().ToLower()"></b>
+        @GameLogic.GetName(activeGame.GameType) against @activeGame.OpponentName
         <div class="last-played code-nice-date">@activeGame.LastActive</div>
     </a>
 }

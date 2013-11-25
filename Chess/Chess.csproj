@@ -42,8 +42,6 @@
     <Compile Include="ChessLogic.cs" />
     <Compile Include="ChessMove.cs" />
     <Compile Include="ChessState.cs" />
-    <Compile Include="Move.cs" />
-    <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

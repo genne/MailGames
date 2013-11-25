@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MailGames.Chess;
+using GameBase;
 
 namespace Chess
 {
@@ -7,7 +7,7 @@ namespace Chess
     {
         private readonly List<Position> _movedPositions = new List<Position>();
         private Dictionary<int,Piece> Cells { get; set; }
-        public PieceColor CurrentColor { get; set; }
+        public GamePlayer CurrentPlayer { get; set; }
 
         public List<Piece> CapturedPieces { get; set; }
 
@@ -23,7 +23,7 @@ namespace Chess
         public ChessState(ChessState state)
         {
             Cells = new Dictionary<int, Piece>(state.Cells);
-            CurrentColor = state.CurrentColor;
+            CurrentPlayer = state.CurrentPlayer;
             CapturedPieces = new List<Piece>(state.CapturedPieces);
             Moves = new LinkedList<PieceMove>(state.Moves);
         }
@@ -40,10 +40,13 @@ namespace Chess
 
         public void SetCell(int cell, Piece piece)
         {
-            var capturedPiece = GetCell(cell);
-            if (capturedPiece != null)
+            if (piece != null)
             {
-                CapturedPieces.Add(capturedPiece);
+                var capturedPiece = GetCell(cell);
+                if (capturedPiece != null)
+                {
+                    CapturedPieces.Add(capturedPiece);
+                }
             }
             if (piece == null) Cells.Remove(cell);
             else Cells[cell] = piece;
@@ -64,9 +67,9 @@ namespace Chess
             _movedPositions.Add(Position.FromInt(to));
         }
 
-        public void SetCell(int row, int col, PieceColor pieceColor, PieceType pieceType)
+        public void SetCell(int row, int col, GamePlayer GamePlayer, PieceType pieceType)
         {
-            SetCell(new Position {Row = row, Col = col}.ToInt(), new Piece{ PieceColor = pieceColor, PieceType = pieceType});
+            SetCell(new Position(col, row).ToInt(), new Piece{ GamePlayer = GamePlayer, PieceType = pieceType});
         }
 
         public void AddMove(Piece piece, int @from, int to)
@@ -78,13 +81,7 @@ namespace Chess
     public class Piece
     {
         public PieceType PieceType { get; set; }
-        public PieceColor PieceColor { get; set; }
-    }
-
-    public enum PieceColor
-    {
-        White,
-        Black
+        public GamePlayer GamePlayer { get; set; }
     }
 
     public enum PieceType

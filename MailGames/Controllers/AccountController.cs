@@ -226,6 +226,10 @@ namespace MailGames.Controllers
                 return RedirectToAction("ExternalLoginFailure");
             }
 
+            if (result.ExtraData.Keys.Contains("accesstoken"))
+            {
+                Session["facebooktoken"] = result.ExtraData["accesstoken"];
+            }
 
             if (OAuthWebSecurity.Login(result.Provider, result.ProviderUserId, createPersistentCookie: false))
             {
@@ -454,6 +458,7 @@ namespace MailGames.Controllers
         }
         #endregion
 
+        [AllowAnonymous]
         public ActionResult LoginUsingGuid(Guid guid, string redirectto)
         {
             var db = new MailGamesContext();

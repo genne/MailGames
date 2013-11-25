@@ -1,0 +1,39 @@
+﻿@using Chess
+@using GameBase
+@using MailGames.Models
+@using Othello
+@model GameOthelloViewModel
+@{
+    Layout = "~/Views/Shared/_Game.cshtml";
+}
+
+<table class="othello-board">
+    @for (int y = 0; y < OthelloLogic.Size; y++)
+    {
+        <tr>
+            @for (int x = 0; x < OthelloLogic.Size; x++)
+            {
+                var position = new Position(x, y);
+                var player = Model.OthelloState.Get(position);
+                <td>
+                    @if (player.HasValue)
+                    {
+                        <div class="player-@player.Value.ToString().ToLower()"></div>
+                    }
+                    else if (Model.State == GameState.YourTurn)
+                    {
+                        if (Model.ValidTargets.Contains(position))
+                        {
+                            <a href="@Url.Action("Select", new {board = Model.Id, cell = position.ToInt()})"></a>
+                        }
+                    }
+                </td>
+            }
+        </tr>
+    }
+</table>
+
+@section scripts
+{
+    <script src="/Scripts/othello.js"></script>
+}

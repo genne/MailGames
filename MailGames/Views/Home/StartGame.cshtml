@@ -1,4 +1,7 @@
-﻿@using MailGames.Controllers
+﻿@model StartGameHomeViewModel
+
+@using MailGames.Controllers
+@using MailGames.Logic
 @using MailGames.Models
 @{
     ViewBag.Title = "Start new game";
@@ -8,13 +11,25 @@
     <div class="form-group">
         <label for="gameType">Game type</label>
         <select name="gameType" class="form-control">
-            <option value="@GameType.Chess">Chess</option>
-            <option value="@GameType.TicTacToe">Tic Tac Toe</option>
+            @foreach (var gameType in GameLogic.GetGameTypes())
+            {
+                <option value="@gameType" @(Request.QueryString["gameType"] == gameType.ToString() ? "selected" : "")>@GameLogic.GetName(gameType)</option>
+            }
         </select>
     </div>
+    @if (Model.Friends != null)
+    {
+        <div class="friend-list">
+            @foreach (var friend in Model.Friends)
+            {
+                <a href="#" title="@friend.Name"><img src="@friend.Picture"/><span>@friend.Name</span></a>
+            }
+            <a href="#" id="invite-friends-button">Invite more friends</a>
+        </div>
+    }
     <div class="form-group">
         <label for="opponentsmail">Opponents mail</label>
-        <input type="email" name="opponentsmail" class="form-control"/>
+        <input type="email" name="opponentsmail" class="form-control" value="@Request.QueryString["opponentsMail"]"/>
     </div>
     
     <button class="btn btn-primary">Start game</button>

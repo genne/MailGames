@@ -1,11 +1,9 @@
 ﻿@using Chess
-@using MailGames.Chess
-@using MailGames.Controllers
-@using MailGames.Models
+@using GameBase
 @model MailGames.Models.ChessBoardViewModel
 
 @{
-    var dontRotateBoard = Model.PlayerColor == PieceColor.White;
+    var dontRotateBoard = Model.PlayerColor == GamePlayer.FirstPlayer;
 }
 
 <table class="chess-table" data-board="@Model.Id">
@@ -18,15 +16,17 @@
                 var col = dontRotateBoard ? origCol : 7 - origCol;
                 var cellColor = (row + col) % 2 == 0 ? "white" : "black";
                 var cell = Model.Cells[col, row];
-                <td class="cell-@cellColor" data-cell="@(new Position{ Col = col, Row = row}.ToInt())">
+                var pos = new Position(col, row).ToInt();
+                <td class="cell-@cellColor @(Model.OpponentMoves.Contains(pos) ? "last-move" : "")" data-cell="@pos">
                     @if (cell != null)
                     {
                         <b class="
                             piece 
                             piece-@cell.PieceType.ToString().ToLower() 
-                            piece-color-@cell.PieceColor.ToString().ToLower()
-                            @(Model.PlayerColor == Model.CurrentColor && Model.CurrentColor == cell.PieceColor ? "selectable" : "")
+                            piece-color-@cell.GamePlayer.ToString().ToLower()
+                            @(Model.PlayerColor == Model.CurrentColor && Model.CurrentColor == cell.GamePlayer ? "selectable" : "")
                             @(cell.PieceType == PieceType.Pawn && origRow==1 ? "code-upgrade-pawn" : "")
+                            @(cell.PieceType == PieceType.King && Model.AttackedKing == cell.GamePlayer ? "attacked" : "")
                             "></b>
                     }
                 </td>
@@ -38,7 +38,6 @@
 @if (Model.CurrentColor == Model.PlayerColor)
 {
     <div class="">
-        <a class="" href="#surrender-modal" data-toggle="modal">Surrender</a>
         <a href="#" class="btn btn-primary disabled code-move-button">Move</a>
     </div>
 
@@ -60,24 +59,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal fade" id="surrender-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">Really surrender?</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to surrender this game?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <a href="@Url.Action("Surrender", new {Model.Id})" class="btn btn-warning">Surrender</a>
                 </div>
             </div>
         </div>

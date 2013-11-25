@@ -223,11 +223,35 @@
     <Content Include="Content\less\colors.min.css">
       <DependentUpon>colors.less</DependentUpon>
     </Content>
+    <Content Include="Content\less\Copy of chess.css">
+      <DependentUpon>othello.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of chess.min.css">
+      <DependentUpon>othello.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of Copy of tictactoe.css">
+      <DependentUpon>othello.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of Copy of tictactoe.min.css">
+      <DependentUpon>othello.less</DependentUpon>
+    </Content>
     <Content Include="Content\less\Copy of tictactoe.css">
       <DependentUpon>chess.less</DependentUpon>
     </Content>
     <Content Include="Content\less\Copy of tictactoe.min.css">
       <DependentUpon>chess.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\game.css">
+      <DependentUpon>game.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\game.min.css">
+      <DependentUpon>game.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\othello.css">
+      <DependentUpon>othello.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\othello.min.css">
+      <DependentUpon>othello.less</DependentUpon>
     </Content>
     <Content Include="Content\less\site.css">
       <DependentUpon>site.less</DependentUpon>
@@ -236,13 +260,36 @@
     <Compile Include="ChessConversion.cs" />
     <Compile Include="Context\ChessBoard.cs" />
     <Compile Include="Context\ChessMove.cs" />
+    <Compile Include="Context\OthelloBoard.cs" />
     <Compile Include="Context\Player.cs" />
     <Compile Include="Context\TicTacToeBoard.cs" />
+    <Compile Include="Context\TicTacToeMove.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ChessController.cs" />
     <Compile Include="Context\MailGamesContext.cs" />
-    <Compile Include="Controllers\GameBoardInfo.cs" />
+    <Compile Include="Controllers\ChessQueries.cs" />
+    <Compile Include="Controllers\OthelloController.cs" />
+    <Compile Include="Controllers\FacebookApi.cs" />
     <Compile Include="Controllers\GameControllerBase.cs" />
+    <Compile Include="Controllers\OthelloConversion.cs" />
+    <Compile Include="Controllers\OthelloQueries.cs" />
+    <Compile Include="Logic\ChessBoardVisitor.cs" />
+    <Compile Include="Logic\GameLogic.cs" />
+    <Compile Include="Logic\IGameBoardVisitor.cs" />
+    <Compile Include="Logic\OthelloVisitor.cs" />
+    <Compile Include="Logic\TicTacToeVisitor.cs" />
+    <Compile Include="Migrations\201311131131172_GameBoardGeneralization.cs" />
+    <Compile Include="Migrations\201311131131172_GameBoardGeneralization.Designer.cs">
+      <DependentUpon>201311131131172_GameBoardGeneralization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311171735147_TicTacToeVariants.cs" />
+    <Compile Include="Migrations\201311171735147_TicTacToeVariants.Designer.cs">
+      <DependentUpon>201311171735147_TicTacToeVariants.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311221149435_OthelloMigration.cs" />
+    <Compile Include="Migrations\201311221149435_OthelloMigration.Designer.cs">
+      <DependentUpon>201311221149435_OthelloMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PlayerManager.cs" />
@@ -264,6 +311,10 @@
       <DependentUpon>201311031858142_MovesDateTime.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\GameTicTacToeViewModel.cs" />
+    <Compile Include="Models\GameViewModel.cs" />
+    <Compile Include="Models\GameOthelloViewModel.cs" />
+    <Compile Include="Models\StartGameHomeViewModel.cs" />
+    <Compile Include="Models\UserHomeViewModel.cs" />
     <Compile Include="TicTacToeConversion.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
@@ -304,11 +355,15 @@
     </Content>
     <Content Include="Scripts\chess.js" />
     <Content Include="Views\Shared\_Game.cshtml" />
+    <Content Include="Views\Home\User.cshtml" />
+    <Content Include="Views\Othello\Game.cshtml" />
     <TypeScriptCompile Include="Scripts\site.ts" />
     <Content Include="Content\less\tictactoe.less" />
     <Content Include="Content\less\chess.less" />
     <Content Include="Content\less\colors.less" />
     <Content Include="Content\less\variables.less" />
+    <Content Include="Content\less\game.less" />
+    <Content Include="Content\less\othello.less" />
     <None Include="Properties\PublishProfiles\mailgames - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mailgames - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
@@ -458,6 +513,10 @@
       <Project>{93D3A47B-BAF9-4886-878F-1B34C5EC31AA}</Project>
       <Name>GameBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Othello\Othello.csproj">
+      <Project>{F4767625-C5D7-4E55-8F39-786F2CC5B632}</Project>
+      <Name>Othello</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TicTacToe\TicTacToe.csproj">
       <Project>{5FAE11F4-6467-49A6-AA45-30FAE05983F5}</Project>
       <Name>TicTacToe</Name>
@@ -484,6 +543,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311031858142_MovesDateTime.resx">
       <DependentUpon>201311031858142_MovesDateTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311131131172_GameBoardGeneralization.resx">
+      <DependentUpon>201311131131172_GameBoardGeneralization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311171735147_TicTacToeVariants.resx">
+      <DependentUpon>201311171735147_TicTacToeVariants.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311221149435_OthelloMigration.resx">
+      <DependentUpon>201311221149435_OthelloMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

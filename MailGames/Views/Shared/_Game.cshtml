@@ -1,43 +1,111 @@
 ﻿@using GameBase
 @using MailGames.Controllers
+@using MailGames.Logic
 @using MailGames.Models
 @model MailGames.Models.GameViewModel
 @{
-    ViewBag.Title = GameBoardInfo.GetName(Model.GameType);
+    ViewBag.Title = GameLogic.GetName(Model.GameType);
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@GameBoardInfo.GetName(Model.GameType)</h1>
+<h1>
+    @GameLogic.GetName(Model.GameType) 
+    <small>
+        against <a href="@Url.Action("User", "Home", new{ Id = Model.OpponentId })">@Model.OpponentName</a>
+        <a href="http://en.wikipedia.org/wiki/@GameLogic.GetWikipediaId(Model.GameType)" target="help"><b class="glyphicon glyphicon-question-sign"></b></a>
+    </small>
+</h1>
 <div class="row">
     <div class="col-md-6">
-        <h3>
-            @switch (Model.State)
+        
+        @if (Model.State == GameState.OpponentsTurn)
+        {
+            if (Model.OpponentActivity == Activity.Passive)
             {
-                case GameState.YourTurn:
-                    <span class="label label-info">Your turn</span>
-                    break;
-                case GameState.OpponentsTurn:
-                    <span class="label label-warning">Opponents turn</span>
-                    break;
-                case GameState.PlayerWon:
-                    <span class="label label-success">You won the game!</span>
-                    break;
-                case GameState.OpponentWon:
-                    <span class="label label-danger">You lost the game :(</span>
-                    break;
-                case GameState.Tie:
-                    <span class="label label-danger">It was a tie :(</span>
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                <div class="jumbotron">
+                    <b class="glyphicon glyphicon-time"></b>
+                    <p>It's been a while since your opponent made a move, send a reminder?</p>
+                    <p><a href="@Url.Action("RemindOpponent", "Home", new {Model.Id, Model.GameType})" class="btn btn-primary btn-lg">Send reminder</a></p>
+                </div>
             }
-        </h3>
+            if (Model.OpponentActivity == Activity.PassiveLostGame)
+            {
+                <div class="jumbotron">
+                    <b class="glyphicon glyphicon-time"></b>
+                    <p>Since your opponent didn't make any move after the reminder, you may as well win the game!</p>
+                    <a href="@Url.Action("RemindOpponent", "Home", new {Model.Id, Model.GameType})" class="btn btn-success btn-lg">Win game!</a>
+                </div>
+            }
+        }
+        
+        @if (!Model.GameOver)
+        {
+                switch (Model.State)
+                 {
+                     case GameState.YourTurn:
+                         <p>Time to make a move!</p>
+                         break;
+                     case GameState.OpponentsTurn:
+                         <p>Waiting for opponent...</p>
+                         break;
+                 }
+        }
+
+        @if (Model.GameOver)
+        {
+            <div class="jumbotron">
+                @switch (Model.State)
+                {
+                    case GameState.PlayerWon:
+                        <b class="glyphicon glyphicon-star"></b>
+                        <h1>You won!</h1>
+                        <p>Well played, you won the game!</p>
+                        break;
+                    case GameState.OpponentWon:
+                        <b class="glyphicon glyphicon-thumbs-down"></b>
+                        <h1>You lost</h1>
+                        <p>Perhaps time for a revenge?</p>
+                        break;
+                    case GameState.Tie:
+                        <b class="glyphicon glyphicon-thumbs-down"></b>
+                        <h1>Tie</h1>
+                        <p>At least your opponent didn't win...</p>
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                <p style=""><a href="@Url.Action("Rematch", "Home", new {Model.Id, Model.GameType})" class="btn btn-primary btn-lg">Rematch</a></p>
+            </div>
+        }
 
         @RenderBody()
+        
+        @if (Model.State == GameState.YourTurn)
+        {
+            <a class="" href="#surrender-modal" data-toggle="modal">Surrender</a>
+        }
     </div>
     
     <div class="col-md-6">
         @RenderSection("moves", false)
+    </div>
+</div>
+
+<div class="modal fade" id="surrender-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Really surrender?</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to surrender this game?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <a href="@Url.Action("Surrender", "Home", new {Model.Id, Model.GameType})" class="btn btn-warning">Surrender</a>
+            </div>
+        </div>
     </div>
 </div>
 

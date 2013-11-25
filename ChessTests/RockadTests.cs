@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Chess;
-using MailGames.Chess;
+using GameBase;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChessTests
@@ -9,9 +9,9 @@ namespace ChessTests
     [TestClass]
     public class RockadTests
     {
-        private static readonly int KingPos = new Position {Row = 7, Col = 4}.ToInt();
-        private static readonly int RookRightPos = new Position { Row = 7, Col = 7 }.ToInt();
-        private static readonly int KingRockadRightPos = new Position { Row = 7, Col = 6 }.ToInt();
+        private static readonly int KingPos = new Position(4, 7).ToInt();
+        private static readonly int RookRightPos = new Position(7, 7).ToInt();
+        private static readonly int KingRockadRightPos = new Position(6, 7).ToInt();
 
         [TestMethod]
         public void TestRockadRight()
@@ -22,25 +22,25 @@ namespace ChessTests
         [TestMethod]
         public void TestRockadLeft()
         {
-            TestRockad(new Position { Row = 7, Col = 0 }.ToInt(), new Position { Row = 7, Col = 2 }.ToInt());
+            TestRockad(new Position(0, 7).ToInt(), new Position(2, 7).ToInt());
         }
 
         [TestMethod]
         public void TestRockadWhenKingAttacked()
         {
-            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position{ Row = 6, Col = 5}, new Piece{ PieceColor = PieceColor.Black, PieceType = PieceType.Pawn }));
+            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 6), new Piece{ GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.Pawn }));
         }
 
         [TestMethod]
         public void TestRockadWhenSpaceAttacked()
         {
-            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position { Row = 6, Col = 5 }, new Piece { PieceColor = PieceColor.Black, PieceType = PieceType.Rook }));
+            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 6), new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.Rook }));
         }
 
         [TestMethod]
         public void TestRockadWhenOccupied()
         {
-            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position { Row = 7, Col = 5 }, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.Knight }));
+            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 7), new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Knight }));
         }
 
         [TestMethod]
@@ -69,8 +69,8 @@ namespace ChessTests
 
         private static void TestRockad(ChessState state, int rookPos, int kingTargetPos, bool canDoRockad, params Tuple<Position, Piece>[] otherPieces)
         {
-            state.SetCell(rookPos, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.Rook });
-            state.SetCell(KingPos, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.King });
+            state.SetCell(rookPos, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Rook });
+            state.SetCell(KingPos, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.King });
 
             foreach (var p in otherPieces)
             {
@@ -84,11 +84,11 @@ namespace ChessTests
         public void TestRockadMove()
         {
             var state = new ChessState();
-            state.SetCell(KingPos, new Piece{ PieceColor = PieceColor.White, PieceType = PieceType.King });
-            var rook = new Piece {PieceColor = PieceColor.White, PieceType = PieceType.Rook};
+            state.SetCell(KingPos, new Piece{ GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.King });
+            var rook = new Piece {GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Rook};
             state.SetCell(RookRightPos, rook);
             ChessLogic.ApplyMove(state, KingPos, KingRockadRightPos, null);
-            int rookRightPosAfterRockad = new Position{ Col = 5, Row = 7 }.ToInt();
+            int rookRightPosAfterRockad = new Position(5, 7).ToInt();
             Assert.AreEqual(state.GetCell(rookRightPosAfterRockad), rook);
         }
     }

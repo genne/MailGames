@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chess;
-using MailGames.Chess;
+using GameBase;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChessTests
@@ -16,9 +16,9 @@ namespace ChessTests
         public void TestPawnConversion()
         {
             var state = new ChessState();
-            var @from = new Position{ Row = 1, Col = 0}.ToInt();
-            var to = new Position{ Row = 0, Col = 0}.ToInt();
-            state.SetCell(from, new Piece{ PieceColor = PieceColor.White, PieceType = PieceType.Pawn});
+            var @from = new Position(0, 1).ToInt();
+            var to = new Position(0, 0).ToInt();
+            state.SetCell(from, new Piece{ GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Pawn});
             const PieceType pawnConversion = PieceType.Rook;
             ChessLogic.ApplyMove(state, from, to, pawnConversion);
 
@@ -30,9 +30,9 @@ namespace ChessTests
         public void TestPawnConversionWhenInvalid()
         {
             var state = new ChessState();
-            var @from = new Position { Row = 1, Col = 0 }.ToInt();
-            var to = new Position { Row = 0, Col = 0 }.ToInt();
-            state.SetCell(from, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.Pawn });
+            var @from = new Position(0, 1).ToInt();
+            var to = new Position(0, 0).ToInt();
+            state.SetCell(from, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Pawn });
             ChessLogic.ApplyMove(state, from, to, null);
         }
 
@@ -41,9 +41,9 @@ namespace ChessTests
         public void TestPawnConversionWhenInvalid2()
         {
             var state = new ChessState();
-            var @from = new Position { Row = 1, Col = 0 }.ToInt();
-            var to = new Position { Row = 0, Col = 0 }.ToInt();
-            state.SetCell(from, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.Rook });
+            var @from = new Position(0, 1).ToInt();
+            var to = new Position(0, 0).ToInt();
+            state.SetCell(from, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Rook });
             const PieceType pawnConversion = PieceType.Rook;
             ChessLogic.ApplyMove(state, from, to, pawnConversion);
         }

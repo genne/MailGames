@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MailGames.Chess
+namespace GameBase
 {
     public class Move
     {

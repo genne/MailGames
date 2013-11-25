@@ -1,24 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameBase;
+using MailGames.Context;
 
 namespace TicTacToe
 {
     public static class TicTacToeLogic
     {
-        public static TicTacToeWinner GetWinner(TicTacToeState state)
+        public static WinnerState? GetWinner(TicTacToeState state)
         {
             var winningColor = GetWinnerColor(state);
             if (winningColor.HasValue)
                 return winningColor.Value == TicTacToeColor.X
-                           ? TicTacToeWinner.FirstPlayer
-                           : TicTacToeWinner.SecondPlayer;
-            if (state.IsFull()) return TicTacToeWinner.Tie;
-            return TicTacToeWinner.None;
+                           ? WinnerState.FirstPlayer
+                           : WinnerState.SecondPlayer;
+            return state.IsFull() ? (WinnerState?) WinnerState.Tie : null;
         }
         public static TicTacToeColor? GetWinnerColor(TicTacToeState state)
         {
-            foreach (var line in AllLines())
+            foreach (var line in AllLines(state.Width, state.Height, state.NumInRow))
             {
                 var winner = GetWinner(state, line);
                 if (winner.HasValue) return winner;
@@ -26,11 +26,21 @@ namespace TicTacToe
             return null;
         }
 
-        private static IEnumerable<Line> AllLines()
+        private static IEnumerable<Line> AllLines(int width, int height, int length)
         {
-            for (int i = 0; i < 3; i++)
+            for (int x = 0; x < width; x++)
             {
-                yield return new Line(0, i, 1, 0);
+                for (int y = 0; y < height; y++)
+                {
+                    if (y <= height - length)
+                        yield return new Line(x, y, 0, 1, length);
+                    if (x <= width - length)
+                        yield return new Line(x, y, 1, 0, length);
+                    if (y <= height - length && x <= width - length)
+                        yield return new Line(x, y, 1, 1, length);
+                    if (y >= length && x <= width - length)
+                        yield return new Line(x, y, 1, -1, length);
+                }
             }
         }
 
@@ -38,30 +48,17 @@ namespace TicTacToe
         {
             var color = state.Get(line.Cells.First());
             if (!color.HasValue) return null;
-            foreach (var cell in line.Cells.Skip(1))
-            {
-                if (state.Get(cell) != color)
-                {
-                    return null;
-                }
-            }
-            return color;
+            return line.Cells.Skip(1).Any(cell => state.Get(cell) != color) ? null : color;
         }
 
         public static GameState GetGameState(TicTacToeState state, TicTacToeColor loggedInPlayer)
         {
             var winner = GetWinnerColor(state);
             if (winner.HasValue)
-            {
-                if (winner == loggedInPlayer)
-                    return GameState.PlayerWon;
-                return GameState.OpponentWon;
-            }
+                return winner == loggedInPlayer ? GameState.PlayerWon : GameState.OpponentWon;
             if (state.IsFull())
                 return GameState.Tie;
-            if (state.CurrentPlayer == loggedInPlayer)
-                return GameState.YourTurn;
-            return GameState.OpponentsTurn;
+            return state.CurrentPlayer == loggedInPlayer ? GameState.YourTurn : GameState.OpponentsTurn;
         }
     }
 }

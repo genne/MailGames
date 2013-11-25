@@ -41,11 +41,11 @@
   <ItemGroup>
     <Compile Include="TicTacToeColor.cs" />
     <Compile Include="Line.cs" />
-    <Compile Include="Position.cs" />
     <Compile Include="PositionComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TicTacToeLogic.cs" />
     <Compile Include="TicTacToeState.cs" />
+    <Compile Include="TicTacToeVariant.cs" />
     <Compile Include="TicTacToeWinner.cs" />
   </ItemGroup>
   <ItemGroup>

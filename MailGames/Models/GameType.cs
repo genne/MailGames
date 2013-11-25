@@ -3,6 +3,8 @@
     public enum GameType
     {
         Chess,
-        TicTacToe
+        TicTacToe,
+        CrissCross,
+        Othello
     }
 }

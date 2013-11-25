@@ -1,4 +1,4 @@
-﻿using MailGames.Chess;
+﻿using GameBase;
 
 namespace Chess
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameBase;
-using MailGames.Chess;
+using MailGames.Context;
 
 namespace Chess
 {
@@ -13,10 +13,10 @@ namespace Chess
             var piece = state.GetCell(sourceCell);
             var pos = Position.FromInt(sourceCell);
             var allTargets = GetAllMoves(piece, pos, state);
-            return allTargets.Where(t => !IsCheck(state, pos, t, state.CurrentColor)).Select(t => pos.Move(t).ToInt());
+            return allTargets.Where(t => !IsCheck(state, pos, t, state.CurrentPlayer)).Select(t => pos.Move(t).ToInt());
         }
 
-        private static bool IsCheck(ChessState state, Position pos, Move move, PieceColor color)
+        private static bool IsCheck(ChessState state, Position pos, Move move, GamePlayer color)
         {
             var targetState = new ChessState(state);
             ApplyMove(targetState, pos.ToInt(), pos.Move(move).ToInt(), IsPawnConversion(state, pos) ? PieceType.Queen : (PieceType?) null);
@@ -25,11 +25,11 @@ namespace Chess
 
         private static bool IsPawnConversion(ChessState state, Position pos)
         {
-            var pawnConversionRow = state.CurrentColor == PieceColor.White ? 1 : 6;
-            return pos.Row == pawnConversionRow && state.GetCell(pos).PieceType == PieceType.Pawn;
+            var pawnConversionRow = state.CurrentPlayer == GamePlayer.FirstPlayer ? 1 : 6;
+            return pos.Y == pawnConversionRow && state.GetCell(pos).PieceType == PieceType.Pawn;
         }
 
-        private static bool IsCheck(ChessState state, PieceColor color)
+        public static bool IsCheck(ChessState state, GamePlayer color)
         {
             return IsAttacked(state, PieceType.King, color);
         }
@@ -40,16 +40,16 @@ namespace Chess
             switch (piece.PieceType)
             {
                 case PieceType.Pawn:
-                    var pawnStartRow = piece.PieceColor == PieceColor.Black ? 1 : 6;
-                    var pawnDir = piece.PieceColor == PieceColor.Black ? 1 : -1;
-                    if (!attackOnly && pos.Row == pawnStartRow) yield return new Move { DeltaRow = 2 * pawnDir };
+                    var pawnStartRow = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : 6;
+                    var pawnDir = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : -1;
+                    if (!attackOnly && pos.Y == pawnStartRow) yield return new Move { DeltaRow = 2 * pawnDir };
 
                     foreach (var directionalMove in new[]{ -1, 1 }.Select(d => new Move{ DeltaRow = pawnDir, DeltaCol = d }))
                     {
                         var position = pos.Move(directionalMove);
-                        if (position.IsOutside()) continue;
+                        if (IsOutside(position)) continue;
                         int directionalMoveTarget = position.ToInt();
-                        if (state.GetCell(directionalMoveTarget) != null && state.GetCell(directionalMoveTarget).PieceColor != piece.PieceColor)
+                        if (state.GetCell(directionalMoveTarget) != null && state.GetCell(directionalMoveTarget).GamePlayer != piece.GamePlayer)
                             yield return directionalMove;
                     }
                     if (!attackOnly)
@@ -97,13 +97,13 @@ namespace Chess
                     // Rockad
                     if (!attackOnly)
                     {
-                        var kingPos = FindPiece(state, PieceType.King, state.CurrentColor);
-                        if (!IsCheck(state, state.CurrentColor) && !HasMoved(state, kingPos))
+                        var kingPos = FindPiece(state, PieceType.King, state.CurrentPlayer);
+                        if (!IsCheck(state, state.CurrentPlayer) && !HasMoved(state, kingPos))
                         {
-                            foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentColor))
+                            foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentPlayer))
                             {
                                 var cellsBetween = GetCellsBetween(kingPos, rookPos, false);
-                                var rookDir = rookPos.Col > kingPos.Col ? 1 : -1;
+                                var rookDir = rookPos.X > kingPos.X ? 1 : -1;
                                 var kingMovement = new Move {DeltaCol = 2*rookDir};
                                 var kingTargetPos = kingPos.Move(kingMovement);
                                 var kingMovementCells = GetCellsBetween(kingPos, kingTargetPos, true);
@@ -111,7 +111,7 @@ namespace Chess
                                 var isCellsBetweenAlreadyOccupied = cellsBetween.Any(c => state.GetCell(c) != null);
                                 var isKingMovementCellsAttacked =
                                     kingMovementCells.Any(
-                                        kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentColor));
+                                        kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentPlayer));
                                 if (!hasRookMoved
                                     && !isCellsBetweenAlreadyOccupied
                                     && !isKingMovementCellsAttacked)
@@ -126,12 +126,17 @@ namespace Chess
             }
         }
 
+        private static bool IsOutside(Position position)
+        {
+            return position.X < 0 || position.Y < 0 || position.X > 7 || position.Y > 7;
+        }
+
         private static IEnumerable<Position> GetCellsBetween(Position from, Position to, bool includeTo)
         {
-            if  (from.Row != to.Row) throw new NotImplementedException();
+            if  (from.Y != to.Y) throw new NotImplementedException();
 
-            var fromCol = @from.Col;
-            var toCol = to.Col;
+            var fromCol = @from.X;
+            var toCol = to.X;
             if (fromCol > toCol)
             {
                 var temp = fromCol;
@@ -142,7 +147,7 @@ namespace Chess
             else if (includeTo) toCol += 1;
             for (int i = fromCol + 1; i < toCol; i++)
             {
-                yield return new Position{ Col = i, Row = from.Row };
+                yield return new Position(i, from.Y);
             }
         }
 
@@ -151,24 +156,24 @@ namespace Chess
             return state.HasMoved(rook);
         }
 
-        private static IEnumerable<Position> FindPieces(ChessState state, PieceType pieceType, PieceColor pieceColor)
+        private static IEnumerable<Position> FindPieces(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
         {
-            return state.GetCells().Where(c => c.Value.PieceColor == pieceColor && c.Value.PieceType == pieceType).Select(p => Position.FromInt(p.Key));
+            return state.GetCells().Where(c => c.Value.GamePlayer == GamePlayer && c.Value.PieceType == pieceType).Select(p => Position.FromInt(p.Key));
         }
 
-        private static Position FindPiece(ChessState state, PieceType pieceType, PieceColor pieceColor)
+        private static Position FindPiece(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
         {
-            return FindPieces(state, pieceType, pieceColor).Single();
+            return FindPieces(state, pieceType, GamePlayer).Single();
         }
 
-        private static bool IsAttacked(ChessState state, PieceType pieceType, PieceColor pieceColor)
+        private static bool IsAttacked(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
         {
-            return IsAttacked(state, FindPiece(state, pieceType, pieceColor), pieceColor);
+            return IsAttacked(state, FindPiece(state, pieceType, GamePlayer), GamePlayer);
         }
 
-        private static bool IsAttacked(ChessState state, Position position, PieceColor pieceColor)
+        private static bool IsAttacked(ChessState state, Position position, GamePlayer GamePlayer)
         {
-            var allOpponentPieces = state.GetCells().Where(c => c.Value.PieceColor != pieceColor);
+            var allOpponentPieces = state.GetCells().Where(c => c.Value.GamePlayer != GamePlayer);
             return
                 allOpponentPieces.Any(
                     p =>
@@ -196,10 +201,10 @@ namespace Chess
         private static TargetState GetTargetState(Piece piece, Position pos, ChessState state, Move move)
         {
             var targetPos = pos.Move(move);
-            if (targetPos.IsOutside()) return TargetState.SelfOrOutside;
+            if (IsOutside(targetPos)) return TargetState.SelfOrOutside;
             var targetCell = state.GetCell(targetPos);
             if (targetCell == null) return TargetState.Blank;
-            if (targetCell.PieceColor != piece.PieceColor) return TargetState.Enemy;
+            if (targetCell.GamePlayer != piece.GamePlayer) return TargetState.Enemy;
             return TargetState.SelfOrOutside;
         }
 
@@ -220,30 +225,30 @@ namespace Chess
             AddReflected(board, 0, 0, PieceType.Rook);
             AddReflected(board, 1, 0, PieceType.Knight);
             AddReflected(board, 2, 0, PieceType.Bishop);
-            SetCell(board, 3, 0, new Piece { PieceColor = PieceColor.Black, PieceType = PieceType.Queen });
-            SetCell(board, 4, 0, new Piece { PieceColor = PieceColor.Black, PieceType = PieceType.King });
-            SetCell(board, 3, 7, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.Queen });
-            SetCell(board, 4, 7, new Piece { PieceColor = PieceColor.White, PieceType = PieceType.King });
+            SetCell(board, 3, 0, new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.Queen });
+            SetCell(board, 4, 0, new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.King });
+            SetCell(board, 3, 7, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Queen });
+            SetCell(board, 4, 7, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.King });
             return board;
         }
 
         private static void AddReflected(ChessState state, int col, int row, PieceType pieceType)
         {
-            SetCell(state, col, row, new Piece { PieceColor = PieceColor.Black, PieceType = pieceType });
-            SetCell(state, col, 7 - row, new Piece { PieceColor = PieceColor.White, PieceType = pieceType });
-            SetCell(state, 7 - col, row,  new Piece { PieceColor = PieceColor.Black, PieceType = pieceType });
-            SetCell(state, 7 - col, 7 - row, new Piece { PieceColor = PieceColor.White, PieceType = pieceType });
+            SetCell(state, col, row, new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = pieceType });
+            SetCell(state, col, 7 - row, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = pieceType });
+            SetCell(state, 7 - col, row,  new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = pieceType });
+            SetCell(state, 7 - col, 7 - row, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = pieceType });
         }
 
         private static void SetCell(ChessState state, int col, int row, Piece piece)
         {
-            state.SetCell(new Position {Col = col, Row = row}.ToInt(), piece);
+            state.SetCell(new Position(col, row).ToInt(), piece);
         }
 
         public static void ApplyMove(ChessState state, int @from, int to, PieceType? pawnConversion)
         {
             ValidateMove(state, @from, to, pawnConversion);
-            state.CurrentColor = GetNextColor(state.CurrentColor);
+            state.CurrentPlayer = GetNextColor(state.CurrentPlayer);
 
             ApplyMoveWithoutColorSwap(state, @from, to, pawnConversion);
 
@@ -251,12 +256,12 @@ namespace Chess
             if (wasKingMoved)
             {
                 var fromPos = Position.FromInt(to);
-                int deltaCol = fromPos.Col - Position.FromInt(from).Col;
+                int deltaCol = fromPos.X - Position.FromInt(from).X;
                 bool isRockad = Math.Abs(deltaCol) > 1;
                 if (isRockad)
                 {
-                    int rookPos = new Position { Col = deltaCol > 0 ? 7 : 0, Row = fromPos.Row }.ToInt();
-                    int rookTargetPos = new Position { Col = deltaCol > 0 ? 5 : 3, Row = fromPos.Row }.ToInt();
+                    int rookPos = new Position(deltaCol > 0 ? 7 : 0, fromPos.Y).ToInt();
+                    int rookTargetPos = new Position(deltaCol > 0 ? 5 : 3, fromPos.Y).ToInt();
                     ApplyMoveWithoutColorSwap(state, rookPos, rookTargetPos, null);
                 }
             }
@@ -265,9 +270,9 @@ namespace Chess
         public static void ValidateMove(ChessState state, int @from, int to, PieceType? convertPawnTo)
         {
             var fromCell = state.GetCell(@from);
-            if (fromCell.PieceColor != state.CurrentColor) throw new ArgumentException("Invalid move", "from");
-            var pawnConversionRow = fromCell.PieceColor == PieceColor.White ? 1 : 6;
-            if ((fromCell.PieceType == PieceType.Pawn && Position.FromInt(from).Row == pawnConversionRow) != convertPawnTo.HasValue) throw new ArgumentException("Invalid pawn conversion", "convertPawnTo");
+            if (fromCell.GamePlayer != state.CurrentPlayer) throw new ArgumentException("Invalid move", "from");
+            var pawnConversionRow = fromCell.GamePlayer == GamePlayer.FirstPlayer ? 1 : 6;
+            if ((fromCell.PieceType == PieceType.Pawn && Position.FromInt(from).Y == pawnConversionRow) != convertPawnTo.HasValue) throw new ArgumentException("Invalid pawn conversion", "convertPawnTo");
             //if (!new ChessLogic().GetAvailableTargets(state, from).Contains(to)) throw new ArgumentException("Invalid move", "to");
         }
 
@@ -284,48 +289,39 @@ namespace Chess
             state.MarkAsMoved(to);
         }
 
-        public static PieceColor GetNextColor(PieceColor currentColor)
+        public static GamePlayer GetNextColor(GamePlayer currentColor)
         {
-            return currentColor == PieceColor.White ? PieceColor.Black : PieceColor.White;
+            return currentColor == GamePlayer.FirstPlayer ? GamePlayer.SecondPlayer : GamePlayer.FirstPlayer;
         }
 
-        public static ChessRunningState GetRunningState(ChessState state)
+        public static WinnerState? GetWinnerState(ChessState state, out bool isCheck)
         {
-            var isCheck = IsCheck(state, state.CurrentColor);
+            isCheck = IsCheck(state, state.CurrentPlayer);
             var canMove = state.GetCells().Any(c =>
             {
                 int sourceCell = c.Key;
                 var piece = state.GetCell(sourceCell);
                 var pos = Position.FromInt(sourceCell);
                 var allTargets = GetAllMoves(piece, pos, state);
-                return c.Value.PieceColor == state.CurrentColor && allTargets.Where(t => !IsCheck(state, pos, t, state.CurrentColor)).Select(t => pos.Move(t).ToInt()).Any();
+                return c.Value.GamePlayer == state.CurrentPlayer && allTargets.Where(t => !IsCheck(state, pos, t, state.CurrentPlayer)).Select(t => pos.Move(t).ToInt()).Any();
             });
-            if (isCheck && canMove) return ChessRunningState.Check;
-            if (isCheck && !canMove) return ChessRunningState.CheckMate;
-            if (!canMove) return ChessRunningState.StaleMate;
-            return ChessRunningState.Nothing;
+            if (canMove) return null;
+            return isCheck ? GetWinnerStateForPlayer(GetNextColor(state.CurrentPlayer)) : WinnerState.Tie;
         }
 
-        public static GameState GetGameState(ChessRunningState state, PieceColor currentPlayer, PieceColor loggedInPlayer)
+        private static WinnerState GetWinnerStateForPlayer(GamePlayer currentPlayer)
         {
-            if (state == ChessRunningState.CheckMate)
+            switch (currentPlayer)
             {
-                if (currentPlayer == loggedInPlayer)
-                    return GameState.PlayerWon;
-                return GameState.OpponentWon;
+                case GamePlayer.FirstPlayer:
+                    return WinnerState.FirstPlayer;
+                    break;
+                case GamePlayer.SecondPlayer:
+                    return WinnerState.SecondPlayer;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("currentPlayer");
             }
-            if (state == ChessRunningState.StaleMate)
-                return GameState.Tie;
-            if (currentPlayer == loggedInPlayer) return GameState.YourTurn;
-            return GameState.OpponentsTurn;
         }
-    }
-
-    public enum ChessRunningState
-    {
-        Nothing,
-        Check,
-        CheckMate,
-        StaleMate
     }
 }

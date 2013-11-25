@@ -60,6 +60,10 @@
       <Project>{59A497CF-3040-4285-9B13-55579E47B957}</Project>
       <Name>Chess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GameBase\GameBase.csproj">
+      <Project>{93D3A47B-BAF9-4886-878F-1B34C5EC31AA}</Project>
+      <Name>GameBase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MailGames\MailGames.csproj">
       <Project>{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}</Project>
       <Name>MailGames</Name>

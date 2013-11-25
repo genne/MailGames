@@ -1,0 +1,51 @@
+﻿@import "variables.less";
+@import "colors.less";
+@import "game.less";
+
+.othello-board
+{
+    td
+        {
+        border: 1px solid black;
+        position: relative;
+        background: @graylight;
+
+        > *
+        {
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            right: 2px;
+            bottom: 2px;
+        }
+
+        a
+        {
+            border: 1px dashed black;
+            border-radius: 50%;
+        }
+
+        .player-firstplayer {
+            background: white;
+            border-radius: 50%;
+            border: 1px solid black;
+        }
+        .player-secondplayer {
+            background: black;
+            border-radius: 50%;
+        }
+    }
+}
+
+.othello-board-base(@size) {
+    .othello-board td {
+        width: @size;
+        height: @size;
+    }
+}
+
+.othello-board-base(320px / 8);
+
+@media (min-width: @screen-sm-min) {
+    .othello-board-base(60px);
+}

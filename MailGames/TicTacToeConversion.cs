@@ -7,7 +7,7 @@ namespace MailGames
     {
         public static TicTacToeState GetState(TicTacToeBoard board)
         {
-            var state = new TicTacToeState();
+            var state = new TicTacToeState(board.Variant);
             foreach (var move in board.Moves)
             {
                 state.Play(move.X, move.Y);

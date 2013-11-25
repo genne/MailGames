@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Chess;
-using MailGames.Chess;
+using GameBase;
+using MailGames.Context;
 
 namespace MailGames.Models
 {
     public class ChessGameViewModel : GameViewModel
     {
+        public ChessGameViewModel(IGameBoard board) : base(board)
+        {
+        }
+
         public ChessBoardViewModel Board { get; set; }
 
         public bool IsCheck { get; set; }

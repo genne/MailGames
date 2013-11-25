@@ -1,6 +1,8 @@
 ﻿@import "colors.less";
+@import "game.less";
 @import "tictactoe.less";
 @import "chess.less";
+@import "othello.less";
 
 .game-list {
     a {
@@ -9,7 +11,6 @@
         padding-right: 10px;
     }
     b {
-        font-size: 30px;
         margin-right: 10px;
         float: left;
     }
@@ -18,5 +19,64 @@
         color: @graylight;
         font-style: italic;
         text-align: right;
+    }
+    
+    .icon-game
+    {
+        display: inline-block;
+        width: 31px;
+        height: 31px;
+        text-align: center;
+    }
+    .icon-game-chess {
+        .icon-game;
+        .piece-king;
+        font-size: 30px;
+    }
+
+    .icon-game-tictactoe {
+        .icon-game;
+        -webkit-transform: rotate(-45deg);
+        margin-top: 10px;
+        font-size: 9px;
+        &:after {
+            content: 'XXX';
+        }
+    }
+
+    .icon-game-crisscross {
+        .icon-game;
+        -webkit-transform: rotate(-45deg);
+        margin-top: 10px;
+        font-size: 9px;
+        &:after {
+            content: 'XXXXX';
+        }
+    }
+
+    .icon-game-othello {
+        .icon-game;
+        font-size: 30px;
+        background: white;
+        border-radius: 50%;
+    }
+}
+
+.jumbotron .glyphicon
+{
+    float: left;
+    margin-right: 30px;
+    font-size: 63px;
+
+    margin-bottom: 100px;
+    margin-top: 20px;
+
+}
+
+.friend-list
+{
+    span
+        {
+        display: none;
     }
 }

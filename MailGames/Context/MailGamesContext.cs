@@ -10,6 +10,8 @@ namespace MailGames.Context
 
         public IDbSet<TicTacToeBoard> TicTacToeBoards { get; set; }
 
+        public IDbSet<OthelloBoard> OthelloBoards { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ChessBoard>().HasRequired(b => b.FirstPlayer).WithMany().WillCascadeOnDelete(false);

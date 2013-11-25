@@ -1,18 +1,20 @@
 ﻿@using GameBase
 @using MailGames.Models
+@using TicTacToe
 @model MailGames.Models.GameTicTacToeViewModel
 @{
-    Layout = "/Shared/_Game.cshtml";
+    Layout = "~/Views/Shared/_Game.cshtml";
 }
 
-<table class="tic-tac-toe-table">
-    @for (int y = 0; y < 3; y++)
+<div style="overflow: auto">
+<table class="tic-tac-toe-table" data-width="@Model.Colors.GetLength(0)">
+    @for (int y = 0; y < Model.Colors.GetLength(1); y++)
     {
         <tr>
-            @for (int x = 0; x < 3; x++)
+            @for (int x = 0; x < Model.Colors.GetLength(0); x++)
             {
                 var color = Model.Colors[x, y];
-                <td>
+                <td class="@(new Position(x, y).Equals(Model.LastMove) ? "last-move" : "")">
                     @if (color.HasValue)
                     {
                         @color.Value
@@ -26,8 +28,4 @@
         </tr>
     }
 </table>
-
-@if (Model.GameOver)
-{
-    <a href="@Url.Action("Rematch", new{ Model.Id })" class="btn btn-primary btn-lg">Rematch</a>
-}
+</div>

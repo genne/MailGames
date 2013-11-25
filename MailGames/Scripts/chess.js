@@ -25,30 +25,32 @@ $(function () {
         var chessTable = p.closest(".chess-table");
         chessTable.find(".available-target").removeClass("available-target").unbind("click");
         clearCurrentTableCell();
-        if (currentSourcePiece != p[0]) {
-            currentSourcePiece = p[0];
-            var board = chessTable.attr("data-board");
-            var selected = p.closest("[data-cell]").attr("data-cell");
-            var upgradePawn = p.hasClass("code-upgrade-pawn");
-            $.post("/chess/getAvailableCells?board=" + board + "&selected=" + selected + "&rand=" + rand, function (data) {
-                $.each(data, function (i, cell) {
-                    var tableCell = chessTable.find("[data-cell=" + cell + "]");
-                    tableCell.addClass("available-target").click(function (ev) {
-                        clearCurrentTableCell();
-                        currentTableCell = tableCell;
-                        tableCell.addClass("selected-target");
-                        var moveUrl = "/chess/move?board=" + board + "&from=" + selected + "&to=" + cell;
-                        if (upgradePawn) {
-                            showUpgradePawnModal(function (convertPawnTo) {
-                                window.location.href = moveUrl + "&convertPawnTo=" + convertPawnTo;
-                            });
-                        } else {
-                            activateMoveButton(moveUrl);
-                        }
-                    });
+        if (currentSourcePiece == p[0]) {
+            currentSourcePiece = null;
+            return;
+        }
+        currentSourcePiece = p[0];
+        var board = chessTable.attr("data-board");
+        var selected = p.closest("[data-cell]").attr("data-cell");
+        var upgradePawn = p.hasClass("code-upgrade-pawn");
+        $.post("/chess/getAvailableCells?board=" + board + "&selected=" + selected + "&rand=" + rand, function (data) {
+            $.each(data, function (i, cell) {
+                var tableCell = chessTable.find("[data-cell=" + cell + "]");
+                tableCell.addClass("available-target").click(function (ev) {
+                    clearCurrentTableCell();
+                    currentTableCell = tableCell;
+                    tableCell.addClass("selected-target");
+                    var moveUrl = "/chess/move?board=" + board + "&from=" + selected + "&to=" + cell;
+                    if (upgradePawn) {
+                        showUpgradePawnModal(function (convertPawnTo) {
+                            window.location.href = moveUrl + "&convertPawnTo=" + convertPawnTo;
+                        });
+                    } else {
+                        activateMoveButton(moveUrl);
+                    }
                 });
             });
-        }
+        });
     };
     var selectPiece = function (p) {
         p.closest(".chess-table").find(".selected").removeClass("selected");

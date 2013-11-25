@@ -1,14 +1,20 @@
 ﻿@using Chess
 @using MailGames.Models
+@using GameBase
 @model ChessGameViewModel
 @{
     Layout = "~/Views/Shared/_Game.cshtml";
 }
 
-    @if (Model.IsCheck)
+@functions
+{
+
+    static string FormatChessPosition(Position position)
     {
-        <span class="label label-warning">Check</span>
+        return (char)((int)'A' + position.X) + (8 - position.Y).ToString();
     }
+
+}
 
 @Html.Partial("_Board", Model.Board)
 
@@ -22,7 +28,7 @@
             <b class="
                             piece 
                             piece-@capturedPiece.PieceType.ToString().ToLower() 
-                            piece-color-@capturedPiece.PieceColor.ToString().ToLower()
+                            piece-color-@capturedPiece.GamePlayer.ToString().ToLower()
                             "></b>
         }
     }
@@ -41,12 +47,12 @@
                     <b class="
                             piece 
                             piece-@move.Piece.PieceType.ToString().ToLower() 
-                            piece-color-@move.Piece.PieceColor.ToString().ToLower()
+                            piece-color-@move.Piece.GamePlayer.ToString().ToLower()
                             "></b>
 
                 </td>
-                <td>@move.From</td>
-                <td>@move.To</td>
+                <td>@FormatChessPosition(move.From)</td>
+                <td>@FormatChessPosition(move.To)</td>
             </tr>
         }
     </table>
