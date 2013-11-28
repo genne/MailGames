@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Web;
 using MailGames.Context;
 using WebMatrix.WebData;
 
@@ -9,7 +10,7 @@ namespace MailGames.Controllers
     {
         public static Player GetCurrent(MailGamesContext db)
         {
-            return db.Players.Single(p => p.Id == WebSecurity.CurrentUserId);
+            return db.Players.Single(p => p.UserName == HttpContext.Current.User.Identity.Name);
         }
 
         public static Player FindOrCreatePlayer(string yourmail, MailGamesContext db)
@@ -28,7 +29,7 @@ namespace MailGames.Controllers
         public static string GetOpponentName(IGameBoard board)
         {
             var opponentPlayer = GetOpponentPlayer(board);
-            return opponentPlayer.UserName ?? opponentPlayer.Mail;
+            return GetPlayerName(opponentPlayer);
         }
 
         private static Player GetOpponentPlayer(IGameBoard board)
@@ -42,6 +43,11 @@ namespace MailGames.Controllers
         public static int GetOpponentId(IGameBoard board)
         {
             return GetOpponentPlayer(board).Id;
+        }
+
+        public static string GetPlayerName(Player player)
+        {
+            return player.FullName ?? player.UserName ?? player.Mail;
         }
     }
 }

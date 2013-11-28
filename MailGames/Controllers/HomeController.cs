@@ -27,8 +27,7 @@ namespace MailGames.Controllers
             var allBoards = GameLogic.GetAllBoards(db);
             var games = allBoards.Where(b => b.FirstPlayer.Id == WebSecurity.CurrentUserId || b.SecondPlayer.Id == WebSecurity.CurrentUserId).Select(b => new
             {
-                Board = b,
-                Opponent = (b.FirstPlayer.Id == WebSecurity.CurrentUserId ? b.SecondPlayer : b.FirstPlayer)
+                Board = b
             }).Select(b => new
             {
                 Finished = b.Board.WinnerState.HasValue,
@@ -37,16 +36,17 @@ namespace MailGames.Controllers
                 {
                     GameType = GameLogic.GetGameType(b.Board),
                     Id = b.Board.Id,
-                    OpponentName = b.Opponent.UserName ?? b.Opponent.Mail,
-                    LastActive = GameLogic.GetLastActive(b.Board)
+                    OpponentName = PlayerManager.GetOpponentName(b.Board),
+                    LastActive = GameLogic.GetLastActive(b.Board),
+                    GameState = GameLogic.GetGameState(b.Board)
                 }
-            });
+            }).ToArray();
             return View(new IndexHomeViewModel
             {
-                UserName = WebSecurity.CurrentUserName,
-                YourTurnGames = games.Where(g => !g.Finished && g.YourTurn).Select(g => g.Game),
-                OpponentTurnGames = games.Where(g => !g.Finished && !g.YourTurn).Select(g => g.Game),
-                FinishedGames = games.Where(g => g.Finished).Select(g => g.Game)
+                UserName = PlayerManager.GetPlayerName(PlayerManager.GetCurrent(db)),
+                YourTurnGames = games.Where(g => !g.Finished && g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
+                OpponentTurnGames = games.Where(g => !g.Finished && !g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
+                FinishedGames = games.Where(g => g.Finished).Select(g => g.Game).OrderByDescending(g => g.LastActive)
             });
         }
 
@@ -128,7 +128,7 @@ namespace MailGames.Controllers
             var model = new MailGamesContext().Players.Where(p => p.Id == id).Select(p => new UserHomeViewModel
             {
                 Guid = p.Guid,
-                Name = p.UserName ?? p.Mail
+                Name = PlayerManager.GetPlayerName(p)
             }).Single();
             return View(model);
         }

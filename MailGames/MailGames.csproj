@@ -273,6 +273,7 @@
     <Compile Include="Controllers\GameControllerBase.cs" />
     <Compile Include="Controllers\OthelloConversion.cs" />
     <Compile Include="Controllers\OthelloQueries.cs" />
+    <Compile Include="Filters\EnsureFullNameAttribute.cs" />
     <Compile Include="Logic\ChessBoardVisitor.cs" />
     <Compile Include="Logic\GameLogic.cs" />
     <Compile Include="Logic\IGameBoardVisitor.cs" />
@@ -289,6 +290,10 @@
     <Compile Include="Migrations\201311221149435_OthelloMigration.cs" />
     <Compile Include="Migrations\201311221149435_OthelloMigration.Designer.cs">
       <DependentUpon>201311221149435_OthelloMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201311251157240_PlayerFullName.cs" />
+    <Compile Include="Migrations\201311251157240_PlayerFullName.Designer.cs">
+      <DependentUpon>201311251157240_PlayerFullName.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -357,6 +362,7 @@
     <Content Include="Views\Shared\_Game.cshtml" />
     <Content Include="Views\Home\User.cshtml" />
     <Content Include="Views\Othello\Game.cshtml" />
+    <Content Include="Views\Account\EnterFullName.cshtml" />
     <TypeScriptCompile Include="Scripts\site.ts" />
     <Content Include="Content\less\tictactoe.less" />
     <Content Include="Content\less\chess.less" />
@@ -552,6 +558,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311221149435_OthelloMigration.resx">
       <DependentUpon>201311221149435_OthelloMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201311251157240_PlayerFullName.resx">
+      <DependentUpon>201311251157240_PlayerFullName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

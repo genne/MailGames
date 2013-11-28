@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using GameBase;
 using MailGames.Controllers;
 
 namespace MailGames.Models
@@ -20,6 +21,8 @@ namespace MailGames.Models
             public Guid Id { get; set; }
 
             public DateTime? LastActive { get; set; }
+
+            public GameState GameState { get; set; }
         }
     }
 }

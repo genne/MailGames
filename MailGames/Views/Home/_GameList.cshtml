@@ -1,12 +1,64 @@
-﻿@using MailGames.Logic
+﻿@using GameBase
+@using MailGames.Context
+@using MailGames.Logic
 @model IEnumerable<MailGames.Models.IndexHomeViewModel.Game>
+
+@functions {
+    public string GetGameStateDescription(GameState gameState)
+    {
+        switch (gameState)
+        {
+            case GameState.YourTurn:
+                return "Your turn against";
+                break;
+            case GameState.OpponentsTurn:
+                return "Waiting for";
+                break;
+            case GameState.PlayerWon:
+                return "You won against";
+                break;
+            case GameState.OpponentWon:
+                return "You lost against";
+                break;
+            case GameState.Tie:
+                return "It was a tie against";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException("gameState");
+        }
+    }
+    
+    public string GetGameStateBtnClass(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.YourTurn:
+                return "primary";
+                break;
+            case GameState.OpponentsTurn:
+                return "info";
+                break;
+            case GameState.PlayerWon:
+                return "success";
+                break;
+            case GameState.OpponentWon:
+                return "danger";
+                break;
+            case GameState.Tie:
+                return "warning";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException("state");
+        }
+    }
+}
 
 <div class="game-list">
 @foreach (var activeGame in Model)
 {
-    <a class="btn btn-primary btn-block" href="@Url.Action("Game", GameLogic.GetController(activeGame.GameType), new{ id = activeGame.Id })">
+    <a class="btn btn-@GetGameStateBtnClass(activeGame.GameState) btn-block" href="@Url.Action("Game", GameLogic.GetController(activeGame.GameType), new{ id = activeGame.Id })">
         <b class="icon-game-@activeGame.GameType.ToString().ToLower()"></b>
-        @GameLogic.GetName(activeGame.GameType) against @activeGame.OpponentName
+        @GetGameStateDescription(activeGame.GameState) @activeGame.OpponentName
         <div class="last-played code-nice-date">@activeGame.LastActive</div>
     </a>
 }

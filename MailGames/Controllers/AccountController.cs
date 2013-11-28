@@ -27,6 +27,21 @@ namespace MailGames.Controllers
             return View();
         }
 
+        public ActionResult EnterFullName(string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult EnterFullName(string name, string returnUrl)
+        {
+            var db = new MailGamesContext();
+            PlayerManager.GetCurrent(db).FullName = name;
+            db.SaveChanges();
+            return new RedirectResult(returnUrl);
+        }
+
         //
         // POST: /Account/Login
 
@@ -37,6 +52,7 @@ namespace MailGames.Controllers
         {
             if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
             {
+                Session.Abandon();
                 return RedirectToLocal(returnUrl);
             }
 
@@ -471,6 +487,7 @@ namespace MailGames.Controllers
                 db.SaveChanges();
             }
             FormsAuthentication.SetAuthCookie(userName, false);
+            Session.Abandon();
             return RedirectToLocal(redirectto);
         }
     }
