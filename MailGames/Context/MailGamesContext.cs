@@ -12,6 +12,8 @@ namespace MailGames.Context
 
         public IDbSet<OthelloBoard> OthelloBoards { get; set; }
 
+        public IDbSet<JapaneseWhistBoard> JapaneseWhistBoards { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ChessBoard>().HasRequired(b => b.FirstPlayer).WithMany().WillCascadeOnDelete(false);

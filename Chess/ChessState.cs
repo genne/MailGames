@@ -72,9 +72,15 @@ namespace Chess
             SetCell(new Position(col, row).ToInt(), new Piece{ GamePlayer = GamePlayer, PieceType = pieceType});
         }
 
-        public void AddMove(Piece piece, int @from, int to)
+        public void AddMove(Piece piece, int @from, int to, Piece capturedPiece)
         {
-            Moves.AddFirst(new PieceMove{ Piece = piece, From = Position.FromInt(from), To = Position.FromInt(to)});
+            Moves.AddFirst(new PieceMove
+            {
+                Piece = piece, 
+                From = Position.FromInt(from), 
+                To = Position.FromInt(to),
+                CapturedPiece = capturedPiece
+            });
         }
     }
 

@@ -8,6 +8,8 @@ namespace Chess
 {
     public static class ChessLogic
     {
+        private const int MaxProgress = 100;
+
         public static IEnumerable<int> GetAvailableTargets(ChessState state, int sourceCell)
         {
             var piece = state.GetCell(sourceCell);
@@ -102,18 +104,18 @@ namespace Chess
                         {
                             foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentPlayer))
                             {
+                                if (HasMoved(state, rookPos)) continue;
+
                                 var cellsBetween = GetCellsBetween(kingPos, rookPos, false);
                                 var rookDir = rookPos.X > kingPos.X ? 1 : -1;
                                 var kingMovement = new Move {DeltaCol = 2*rookDir};
                                 var kingTargetPos = kingPos.Move(kingMovement);
                                 var kingMovementCells = GetCellsBetween(kingPos, kingTargetPos, true);
-                                var hasRookMoved = HasMoved(state, rookPos);
                                 var isCellsBetweenAlreadyOccupied = cellsBetween.Any(c => state.GetCell(c) != null);
                                 var isKingMovementCellsAttacked =
                                     kingMovementCells.Any(
                                         kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentPlayer));
-                                if (!hasRookMoved
-                                    && !isCellsBetweenAlreadyOccupied
+                                if (!isCellsBetweenAlreadyOccupied
                                     && !isKingMovementCellsAttacked)
                                     yield return kingMovement;
                             }
@@ -156,9 +158,14 @@ namespace Chess
             return state.HasMoved(rook);
         }
 
-        private static IEnumerable<Position> FindPieces(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
+        private static IEnumerable<Position> FindPieces(ChessState state, PieceType pieceType, GamePlayer gamePlayer)
         {
-            return state.GetCells().Where(c => c.Value.GamePlayer == GamePlayer && c.Value.PieceType == pieceType).Select(p => Position.FromInt(p.Key));
+            return state.GetCells().Where(c => c.Value.GamePlayer == gamePlayer && c.Value.PieceType == pieceType).Select(p => Position.FromInt(p.Key));
+        }
+
+        private static IEnumerable<KeyValuePair<int, Piece>> FindPieces(ChessState state, GamePlayer gamePlayer)
+        {
+            return state.GetCells().Where(c => c.Value.GamePlayer == gamePlayer);
         }
 
         private static Position FindPiece(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
@@ -283,9 +290,10 @@ namespace Chess
             {
                 piece.PieceType = pawnConversion.Value;
             }
+            var capturedPiece = state.GetCell(to);
             state.SetCell(to, piece);
             state.SetCell(@from, null);
-            state.AddMove(piece, from, to);
+            state.AddMove(piece, from, to, capturedPiece);
             state.MarkAsMoved(to);
         }
 
@@ -321,6 +329,41 @@ namespace Chess
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("currentPlayer");
+            }
+        }
+
+        public static float GetProgress(ChessState state, GamePlayer player)
+        {
+            var points1 = GetPoints(state, player);
+            var points2 = GetPoints(state, GameBaseLogic.GetNextPlayer(player));
+            if (points1 == 0) return 0;
+            if (points2 == 0) return MaxProgress;
+            return Math.Max(0, Math.Min(MaxProgress, (MaxProgress / 2) + (points1 - points2) * (MaxProgress / 2) / GetPieceTypePoints(PieceType.Queen)));
+        }
+
+        private static int GetPoints(ChessState state, GamePlayer gamePlayer)
+        {
+            return FindPieces(state, gamePlayer).Sum(p => GetPieceTypePoints(p.Value.PieceType));
+        }
+
+        private static int GetPieceTypePoints(PieceType pieceType)
+        {
+            switch (pieceType)
+            {
+                case PieceType.Pawn:
+                    return 1;
+                case PieceType.Knight:
+                    return 3;
+                case PieceType.Bishop:
+                    return 3;
+                case PieceType.Rook:
+                    return 5;
+                case PieceType.Queen:
+                    return 9;
+                case PieceType.King:
+                    return 0;
+                default:
+                    throw new ArgumentOutOfRangeException("pieceType");
             }
         }
     }

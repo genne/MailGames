@@ -3,6 +3,7 @@
 @import "tictactoe.less";
 @import "chess.less";
 @import "othello.less";
+@import "japanesewhist.less";
 
 .game-list {
     a {
@@ -59,6 +60,14 @@
         font-size: 30px;
         background: white;
         border-radius: 50%;
+    }
+
+    .icon-game-japanesewhist {
+        .icon-game;
+        font-size: 25px;
+        &:after {
+            content: 'W';
+        }
     }
 }
 

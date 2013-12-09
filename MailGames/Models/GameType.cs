@@ -5,6 +5,7 @@
         Chess,
         TicTacToe,
         CrissCross,
-        Othello
+        Othello,
+        JapaneseWhist
     }
 }

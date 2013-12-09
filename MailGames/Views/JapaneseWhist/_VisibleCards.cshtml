@@ -1,0 +1,175 @@
+﻿@using JapaneseWhist
+@model MailGames.Models.VisibleCardsViewModel
+
+@functions
+{
+
+    string GetValueCharacter(CardValue value)
+    {
+        var firstChar = value.ToString().Substring(0, 1);
+        return firstChar != "_" ? firstChar : value.ToString().Substring(1);
+    }
+    
+    bool IsFaceCard(CardValue value)
+    {
+        return value >= CardValue.Jack && value <= CardValue.King;
+    }
+
+}
+
+<div class="visible-cards">
+    @{
+        var index = 0;
+    }
+    @foreach (var card in Model.Deck.All(includeEmpty: true))
+    {
+        <div class="card-holder">
+            @if (card != null)
+            {
+                var selectUrl = Model.SelectUrl != null ? Model.SelectUrl(index) : null;
+                var selectable = selectUrl != null;
+                <a href="@selectUrl" class="visible-card color-@card.Color.ToString().ToLower() @(selectable ? "selectable" : "")">
+                    <div class="upper-left">
+                        <div class="card-value">@GetValueCharacter(card.Val)</div>
+                        <div class="card-color"></div>
+                    </div>
+                    <div class="bottom-right">
+                        <div class="card-value">@GetValueCharacter(card.Val)</div>
+                        <div class="card-color"></div>
+                    </div>
+                
+                    @if (IsFaceCard(card.Val))
+                    {
+                        
+                    }
+                    else
+                    {
+                        <div class="symbols">
+                            <table>
+                                <tr>
+                                    <td>
+                                        @if (card.Val >= CardValue._4 && card.Val <= CardValue._10)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue._2 || card.Val == CardValue._3)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val >= CardValue._4 && card.Val <= CardValue._10)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                </tr>
+                                @if (card.Val == CardValue._10)
+                                {
+                                    <tr>
+                                        <td></td><td>
+                                                     <div class="card-color"></div>
+                                                 </td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <td>
+                                        @if (card.Val == CardValue._9 || card.Val == CardValue._10)
+                                        {
+                                            <div class="card-color"></div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue._7 || card.Val == CardValue._8)
+                                        {
+                                            <div class="card-color"></div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue._9 || card.Val == CardValue._10)
+                                        {
+                                            <div class="card-color"></div>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @if (card.Val >= CardValue._6 && card.Val <= CardValue._8)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue.Ace || card.Val == CardValue._3 || card.Val == CardValue._5 || card.Val == CardValue._9)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val >= CardValue._6 && card.Val <= CardValue._8)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @if (card.Val == CardValue._9 || card.Val == CardValue._10)
+                                        {
+                                            <div class="card-color"></div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue._8)
+                                        {
+                                            <div class="card-color"></div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue._9 || card.Val == CardValue._10)
+                                        {
+                                            <div class="card-color"></div>
+                                        }
+                                    </td>
+                                </tr>
+                                @if (card.Val == CardValue._10)
+                                {
+                                    <tr>
+                                        <td></td><td>
+                                                     <div class="card-color"></div>
+                                                 </td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <td>
+                                        @if (card.Val >= CardValue._4 && card.Val <= CardValue._10)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val == CardValue._2 || card.Val == CardValue._3)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (card.Val >= CardValue._4 && card.Val <= CardValue._10)
+                                        {
+                                            <div class="card-color"></div>        
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                </a>
+            }
+        </div>
+        index++;
+    }
+</div>

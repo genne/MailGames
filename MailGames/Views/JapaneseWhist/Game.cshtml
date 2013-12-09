@@ -1,0 +1,74 @@
+﻿@using JapaneseWhist
+@using MailGames.Models
+@model MailGames.Models.JapaneseWhistGameViewModel
+
+@{
+    Layout = "~/Views/Shared/_Game.cshtml";
+}
+
+<small>Current stick</small>
+@Html.Partial("_VisibleCards", new VisibleCardsViewModel
+{
+    Deck = Model.CurrentStick
+})
+
+<br/>
+<small>Opponent's cards</small>
+<div class="table-cards">
+    @Html.Partial("_HiddenCards", Model.OpponentHiddenCards)
+    @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.OpponentVisibleCards })
+</div>
+<br/>
+<small>Your cards</small>
+<div class="table-cards">
+    @Html.Partial("_HiddenCards", Model.PlayerHiddenCards)
+    @Html.Partial("_VisibleCards", new VisibleCardsViewModel 
+    { 
+        Deck = Model.PlayerVisibleCards,
+        SelectUrl = i => Model.SelectableVisibleCards.Contains(i) ? Url.Action("Select", new{ Model.Id, deck = PlayerDeck.Visible, index = i}) : null
+    })
+</div>
+<br/>
+<div class="cards-stacked2">
+@if (Model.CanPlayFromHand)
+{
+    @Html.Partial("_VisibleCards", new VisibleCardsViewModel
+    {
+        Deck = Model.PlayerHandCards, 
+        SelectUrl = i => Model.SelectableHandCards.Contains(i) ? Url.Action("Select", new{ Model.Id, deck = PlayerDeck.Hand, index = i}) : null
+    })
+}
+else
+{
+    <small>Hand cards aren't playable first round...</small>
+    @Html.Partial("_HiddenCards", Model.PlayerHandCards)
+}
+</div>
+
+@section moves
+{
+    <p>Opponent hand cards: @Model.OpponentHandCards.Count()</p>
+    <h2>Score</h2>
+    <h3><small>You</small> <span class="label label-success">@Model.PlayerTotalScore</span> <small>Opponent</small> <span class="label label-danger">@Model.OpponentTotalScore</span></h3>
+
+    <h2>Your sticks</h2>
+    <div class="cards-stacked pull-left">
+        @Html.Partial("_HiddenCards", Model.PlayerSticks)
+    </div>
+    <div class="cards-random">
+        @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.PlayerLastStick })
+    </div>
+
+    <h2>Opponent sticks</h2>
+    <div class="cards-stacked pull-left">
+        @Html.Partial("_HiddenCards", Model.OpponentSticks)
+    </div>
+    <div class="cards-random">
+        @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.OpponentLastStick })
+    </div>
+}
+
+@section scripts
+{
+}
+

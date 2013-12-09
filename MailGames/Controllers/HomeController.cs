@@ -125,7 +125,7 @@ namespace MailGames.Controllers
 
         public ActionResult User(int id)
         {
-            var model = new MailGamesContext().Players.Where(p => p.Id == id).Select(p => new UserHomeViewModel
+            var model = new MailGamesContext().Players.Where(p => p.Id == id).ToArray().Select(p => new UserHomeViewModel
             {
                 Guid = p.Guid,
                 Name = PlayerManager.GetPlayerName(p)

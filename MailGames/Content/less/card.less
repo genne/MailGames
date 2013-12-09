@@ -1,0 +1,140 @@
+﻿@import "utils.less";
+
+@card-height: 70px;
+@card-width: @card-height * 0.7;
+@card-margin: 1px;
+@card-total-width: @card-width + @card-margin;
+
+.hidden-cards, .visible-cards
+{
+    font-size: 0px;
+    min-height: @card-height;
+}
+.card-holder {
+    display: inline-block;
+    width: @card-width;
+    height: @card-height;
+    position: relative;
+    font-size: @card-height / 5;
+    margin-right: @card-margin;
+    margin-bottom: @card-margin;
+
+    .hidden-card, .visible-card {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        border: 1px solid black;
+        border-radius: 5%;
+    }
+
+    .hidden-card {
+        background: #36c;
+    }
+
+    .visible-card {
+        background: darken(white, 10%);
+
+        &.selectable {
+            background: white;
+            //cursor: pointer;
+        }
+
+        color: black;
+        &.color-heart, &.color-diamonds {
+            color: red;
+        }
+
+        &.color-heart .card-color:after {
+            content: '♥';
+        }
+
+        &.color-clubs .card-color:after {
+            content: '♣';
+        }
+
+        &.color-spade .card-color:after {
+            content: '♠';
+        }
+
+        &.color-diamonds .card-color:after {
+            content: '♦';
+        }
+
+        .card-value
+        {
+            font-size: 0.8em;
+            text-align: center;
+        }
+
+        .upper-left {
+            position: absolute;
+            left: @card-height / 50;
+            top: 0px;
+        }
+
+        .bottom-right {
+            position: absolute;
+            bottom: 0px;
+            right: @card-height / 50;
+            .rotate(180deg);
+        }
+
+        .upper-left, .bottom-right {
+            .card-color {
+                line-height: 0.3em;
+                text-align: center;
+            }
+        }
+
+        .symbols {
+            position: absolute;
+            top: @card-height * 0.03;
+            bottom: @card-height * 0.03;
+            left: @card-height * 0.18;
+            right: @card-height * 0.18;
+            text-align: center;
+            table
+                {
+                width: 100%;
+                height: 100%;
+
+                td{ 
+                    position: relative;
+                    .card-color
+                    {
+                        position: absolute;
+                        margin-top: -@card-height * 0.13;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.stacked-cards(@percent)
+{
+    .card-holder:not(:first-child){
+        margin-left: -@card-total-width * @percent;
+    }
+}
+
+.cards-stacked
+{
+    .stacked-cards(0.9);
+}
+
+.cards-stacked2
+{
+    .stacked-cards(0.1);
+}
+
+.cards-random
+{
+    .stacked-cards(0.2);
+    .card-holder
+    {
+        .rotate(-10deg);
+    }
+}

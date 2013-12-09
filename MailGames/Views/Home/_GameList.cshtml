@@ -59,7 +59,8 @@
     <a class="btn btn-@GetGameStateBtnClass(activeGame.GameState) btn-block" href="@Url.Action("Game", GameLogic.GetController(activeGame.GameType), new{ id = activeGame.Id })">
         <b class="icon-game-@activeGame.GameType.ToString().ToLower()"></b>
         @GetGameStateDescription(activeGame.GameState) @activeGame.OpponentName
-        <div class="last-played code-nice-date">@activeGame.LastActive</div>
+        <div></div>
+        <div class="last-played">@GameLogic.GetName(activeGame.GameType), last active <span class=" code-nice-date">@activeGame.LastActive</span></div>
     </a>
 }
 </div>

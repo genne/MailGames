@@ -1,0 +1,15 @@
+﻿@model JapaneseWhist.Deck
+
+<div class="hidden-cards">
+@foreach (var card in Model.All(includeEmpty: true))
+{
+    <div class="card-holder">
+        @if (card != null)
+        {
+            <div class="hidden-card">
+        
+            </div>
+        }
+    </div>
+}
+</div>

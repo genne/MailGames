@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B57A9F15-BEF9-45FC-B2CA-4D38136E674D}</ProjectGuid>
+    <ProjectGuid>{A6FF88F8-A1E6-419D-8DA0-2E8658447036}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ChessTests</RootNamespace>
-    <AssemblyName>ChessTests</AssemblyName>
+    <RootNamespace>JapaneseWhistTests</RootNamespace>
+    <AssemblyName>JapaneseWhistTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -50,28 +50,18 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="CheckTests.cs" />
-    <Compile Include="ChessTests.cs" />
-    <Compile Include="PawnConversionTests.cs" />
-    <Compile Include="RockadTests.cs" />
+    <Compile Include="JapaneseWhistTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chess\Chess.csproj">
-      <Project>{59A497CF-3040-4285-9B13-55579E47B957}</Project>
-      <Name>Chess</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GameBase\GameBase.csproj">
       <Project>{93D3A47B-BAF9-4886-878F-1B34C5EC31AA}</Project>
       <Name>GameBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MailGames\MailGames.csproj">
-      <Project>{E5CC5DCA-454A-4918-B8A2-20826FF35E8E}</Project>
-      <Name>MailGames</Name>
+    <ProjectReference Include="..\JapaneseWhist\JapaneseWhist.csproj">
+      <Project>{D4C06052-F025-4C91-A305-A2AE91D3C99B}</Project>
+      <Name>JapaneseWhist</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

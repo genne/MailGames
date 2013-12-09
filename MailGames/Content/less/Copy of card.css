@@ -1,0 +1,84 @@
+﻿.card-holder {
+  display: inline-block;
+  width: 70px;
+  height: 100px;
+  position: relative;
+  font-size: 20px;
+}
+.card-holder .hidden-card,
+.card-holder .visible-card {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+.card-holder .hidden-card {
+  background: lightblue;
+}
+.card-holder .visible-card {
+  background: white;
+}
+.card-holder .visible-card.color-heart,
+.card-holder .visible-card.color-clubs {
+  color: red;
+}
+.card-holder .visible-card.color-heart .card-color:after {
+  content: '♥';
+}
+.card-holder .visible-card.color-clubs .card-color:after {
+  content: '♣';
+}
+.card-holder .visible-card.color-spade .card-color:after {
+  content: '♠';
+}
+.card-holder .visible-card.color-diamonds .card-color:after {
+  content: '♦';
+}
+.card-holder .visible-card .card-value {
+  font-size: 0.8em;
+  text-align: center;
+}
+.card-holder .visible-card .upper-left {
+  position: absolute;
+  left: 2px;
+  top: 0px;
+}
+.card-holder .visible-card .bottom-right {
+  position: absolute;
+  bottom: 0px;
+  right: 2px;
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  /* IE 9 */
+
+  -webkit-transform: rotate(180deg);
+  /* Safari and Chrome */
+
+}
+.card-holder .visible-card .upper-left .card-color,
+.card-holder .visible-card .bottom-right .card-color {
+  line-height: 10px;
+  text-align: center;
+}
+.card-holder .visible-card .symbols {
+  position: absolute;
+  left: 18px;
+  top: 3px;
+  bottom: 3px;
+  right: 18px;
+  text-align: center;
+}
+.card-holder .visible-card .symbols table {
+  width: 100%;
+  height: 100%;
+}
+.card-holder .visible-card .symbols table td {
+  position: relative;
+}
+.card-holder .visible-card .symbols table td .card-color {
+  position: absolute;
+  margin-top: -13px;
+}

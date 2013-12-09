@@ -1,0 +1,17 @@
+﻿@import "card.less";
+
+.game-japanesewhist
+{
+    .table-cards{
+        position: relative;
+        .visible-cards{
+            position: absolute;
+            left: 3px;
+            top: 3px;
+        }
+
+        > div {
+            width: @card-total-width * 5;
+        }
+    }
+}

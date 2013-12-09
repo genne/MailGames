@@ -21,6 +21,8 @@ namespace MailGames.Models
 
         public IEnumerable<PieceMove> Moves { get; set; }
 
+        public float Progress { get; set; }
+
         public class Move
         {
             public Piece Piece { get; set; }

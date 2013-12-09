@@ -15,7 +15,7 @@
         <a href="http://en.wikipedia.org/wiki/@GameLogic.GetWikipediaId(Model.GameType)" target="help"><b class="glyphicon glyphicon-question-sign"></b></a>
     </small>
 </h1>
-<div class="row">
+<div class="row game-@Model.GameType.ToString().ToLower()">
     <div class="col-md-6">
         
         @if (Model.State == GameState.OpponentsTurn)
@@ -111,5 +111,5 @@
 
 @section scripts
 {
-    @RenderSection("scripts", false);
+    @RenderSection("scripts", false)
 }

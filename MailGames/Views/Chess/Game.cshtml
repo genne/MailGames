@@ -11,12 +11,92 @@
 
     static string FormatChessPosition(Position position)
     {
-        return (char)((int)'A' + position.X) + (8 - position.Y).ToString();
+        return FormatColPosition(position.X) + FormatRowPosition(position.Y);
+    }
+
+    private static string FormatRowPosition(int y)
+    {
+        return (8 - y).ToString();
+    }
+
+    private static string FormatColPosition(int x)
+    {
+        return ((char)((int)'A' + x)).ToString();
     }
 
 }
 
-@Html.Partial("_Board", Model.Board)
+@{
+    var dontRotateBoard = Model.Board.PlayerColor == GamePlayer.FirstPlayer;
+}
+
+<table class="chess-table" data-board="@Model.Id">
+    @for (var origRow = 0; origRow < 8; origRow++ )
+    {
+        var row = dontRotateBoard ? origRow : 7 - origRow;
+        <tr>
+            @for (var origCol = 0; origCol < 8; origCol++)
+            {
+                var col = dontRotateBoard ? origCol : 7 - origCol;
+                var cellColor = (row + col) % 2 == 0 ? "white" : "black";
+                var cell = Model.Board.Cells[col, row];
+                var pos = new Position(col, row).ToInt();
+                <td class="cell-@cellColor @(Model.Board.OpponentMoves.Contains(pos) ? "last-move" : "")" data-cell="@pos">
+                    @if (cell != null)
+                    {
+                        <b class="
+                            piece 
+                            piece-@cell.PieceType.ToString().ToLower() 
+                            piece-color-@cell.GamePlayer.ToString().ToLower()
+                            @(Model.Board.PlayerColor == Model.Board.CurrentColor && Model.Board.CurrentColor == cell.GamePlayer ? "selectable" : "")
+                            @(cell.PieceType == PieceType.Pawn && origRow==1 ? "code-upgrade-pawn" : "")
+                            @(cell.PieceType == PieceType.King && Model.Board.AttackedKing == cell.GamePlayer ? "attacked" : "")
+                            "></b>
+                    }
+                </td>
+            }
+            <td class="position-id">@FormatRowPosition(row)</td>
+        </tr>
+    }
+    <tr>
+        @for (int origCol = 0; origCol < 8; origCol++)
+        {
+            var col = dontRotateBoard ? origCol : 7 - origCol;
+            <td class="position-id">@FormatColPosition(col)</td>
+        }
+    </tr>
+</table>
+
+@if (Model.Board.CurrentColor == Model.Board.PlayerColor)
+{
+    <div class="">
+        <a href="#" class="btn btn-primary disabled code-move-button">Move</a>
+    </div>
+
+    <div class="modal fade" id="pawn-upgrade-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Select target piece</h4>
+                </div>
+                <div class="modal-body">
+                    @foreach (var pieceType in Enum.GetValues(typeof (PieceType)).OfType<PieceType>())
+                    {
+                        if (pieceType != PieceType.Pawn && pieceType != PieceType.King)
+                        {
+                            <button type="button" class="btn btn-primary btn-lg code-convert-pawn-button" data-piece-type="@pieceType"><b class="piece-@pieceType.ToString().ToLower()"></b></button>
+                        }
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 @section moves
 {
@@ -31,6 +111,20 @@
                             piece-color-@capturedPiece.GamePlayer.ToString().ToLower()
                             "></b>
         }
+        var dangerProgress = Math.Max(0, 50 - Model.Progress) * 2;
+        var successProgress = Math.Max(0, Model.Progress - 50) * 2;
+        
+    <div class="current-progress">
+        <div class="progress">
+            <div class="progress-bar progress-bar-danger pull-right" role="progressbar" aria-valuenow="@dangerProgress" aria-valuemin="0" aria-valuemax="100" style="width: @dangerProgress%;">
+                <span class="sr-only">60% Complete</span>
+            </div>
+        </div><div class="progress">
+            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="@successProgress" aria-valuemin="0" aria-valuemax="100" style="width: @successProgress%;">
+                <span class="sr-only">60% Complete</span>
+            </div>
+        </div>
+    </div>
     }
     else
     {
@@ -39,20 +133,30 @@
     
     <h2>Moves</h2>
     <table class="table">
-        <thead><tr><th>Piece</th><th>From</th><th>To</th></tr></thead>
+        <thead><tr><th>From</th><th>To</th></tr></thead>
         @foreach (var move in Model.Moves)
         {
             <tr>
                 <td>
-                    <b class="
+                    @FormatChessPosition(move.From)
+                        <b class="
                             piece 
                             piece-@move.Piece.PieceType.ToString().ToLower() 
                             piece-color-@move.Piece.GamePlayer.ToString().ToLower()
                             "></b>
 
                 </td>
-                <td>@FormatChessPosition(move.From)</td>
-                <td>@FormatChessPosition(move.To)</td>
+                <td>
+                    @FormatChessPosition(move.To)
+                    @if (move.CapturedPiece != null)
+                    {
+                        <b class="
+                            piece 
+                            piece-@move.CapturedPiece.PieceType.ToString().ToLower() 
+                            piece-color-@move.CapturedPiece.GamePlayer.ToString().ToLower()
+                            "></b>
+                    }
+                </td>
             </tr>
         }
     </table>

@@ -211,6 +211,12 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\less\card.css">
+      <DependentUpon>card.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\card.min.css">
+      <DependentUpon>card.less</DependentUpon>
+    </Content>
     <Content Include="Content\less\chess.css">
       <DependentUpon>chess.less</DependentUpon>
     </Content>
@@ -222,6 +228,12 @@
     </Content>
     <Content Include="Content\less\colors.min.css">
       <DependentUpon>colors.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of card.css">
+      <DependentUpon>japanesewhist.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\Copy of card.min.css">
+      <DependentUpon>japanesewhist.less</DependentUpon>
     </Content>
     <Content Include="Content\less\Copy of chess.css">
       <DependentUpon>othello.less</DependentUpon>
@@ -247,6 +259,12 @@
     <Content Include="Content\less\game.min.css">
       <DependentUpon>game.less</DependentUpon>
     </Content>
+    <Content Include="Content\less\japanesewhist.css">
+      <DependentUpon>japanesewhist.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\japanesewhist.min.css">
+      <DependentUpon>japanesewhist.less</DependentUpon>
+    </Content>
     <Content Include="Content\less\othello.css">
       <DependentUpon>othello.less</DependentUpon>
     </Content>
@@ -260,6 +278,7 @@
     <Compile Include="ChessConversion.cs" />
     <Compile Include="Context\ChessBoard.cs" />
     <Compile Include="Context\ChessMove.cs" />
+    <Compile Include="Context\JapaneseWhistBoard.cs" />
     <Compile Include="Context\OthelloBoard.cs" />
     <Compile Include="Context\Player.cs" />
     <Compile Include="Context\TicTacToeBoard.cs" />
@@ -268,6 +287,7 @@
     <Compile Include="Controllers\ChessController.cs" />
     <Compile Include="Context\MailGamesContext.cs" />
     <Compile Include="Controllers\ChessQueries.cs" />
+    <Compile Include="Controllers\JapaneseWhistController.cs" />
     <Compile Include="Controllers\OthelloController.cs" />
     <Compile Include="Controllers\FacebookApi.cs" />
     <Compile Include="Controllers\GameControllerBase.cs" />
@@ -277,6 +297,8 @@
     <Compile Include="Logic\ChessBoardVisitor.cs" />
     <Compile Include="Logic\GameLogic.cs" />
     <Compile Include="Logic\IGameBoardVisitor.cs" />
+    <Compile Include="Logic\JapaneseWhistConversion.cs" />
+    <Compile Include="Logic\JapaneseWhistVisitor.cs" />
     <Compile Include="Logic\OthelloVisitor.cs" />
     <Compile Include="Logic\TicTacToeVisitor.cs" />
     <Compile Include="Migrations\201311131131172_GameBoardGeneralization.cs" />
@@ -294,6 +316,10 @@
     <Compile Include="Migrations\201311251157240_PlayerFullName.cs" />
     <Compile Include="Migrations\201311251157240_PlayerFullName.Designer.cs">
       <DependentUpon>201311251157240_PlayerFullName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201312031114471_JapaneseWhistMigration.cs" />
+    <Compile Include="Migrations\201312031114471_JapaneseWhistMigration.Designer.cs">
+      <DependentUpon>201312031114471_JapaneseWhistMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -318,8 +344,10 @@
     <Compile Include="Models\GameTicTacToeViewModel.cs" />
     <Compile Include="Models\GameViewModel.cs" />
     <Compile Include="Models\GameOthelloViewModel.cs" />
+    <Compile Include="Models\JapaneseWhistGameViewModel.cs" />
     <Compile Include="Models\StartGameHomeViewModel.cs" />
     <Compile Include="Models\UserHomeViewModel.cs" />
+    <Compile Include="Models\VisibleCardsViewModel.cs" />
     <Compile Include="TicTacToeConversion.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
@@ -352,6 +380,12 @@
     <Content Include="Content\less\tictactoe.min.css">
       <DependentUpon>tictactoe.less</DependentUpon>
     </Content>
+    <Content Include="Content\less\utils.css">
+      <DependentUpon>utils.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\utils.min.css">
+      <DependentUpon>utils.less</DependentUpon>
+    </Content>
     <Content Include="Content\less\variables.css">
       <DependentUpon>variables.less</DependentUpon>
     </Content>
@@ -363,6 +397,9 @@
     <Content Include="Views\Home\User.cshtml" />
     <Content Include="Views\Othello\Game.cshtml" />
     <Content Include="Views\Account\EnterFullName.cshtml" />
+    <Content Include="Views\JapaneseWhist\Game.cshtml" />
+    <Content Include="Views\JapaneseWhist\_HiddenCards.cshtml" />
+    <Content Include="Views\JapaneseWhist\_VisibleCards.cshtml" />
     <TypeScriptCompile Include="Scripts\site.ts" />
     <Content Include="Content\less\tictactoe.less" />
     <Content Include="Content\less\chess.less" />
@@ -370,6 +407,9 @@
     <Content Include="Content\less\variables.less" />
     <Content Include="Content\less\game.less" />
     <Content Include="Content\less\othello.less" />
+    <Content Include="Content\less\card.less" />
+    <Content Include="Content\less\utils.less" />
+    <Content Include="Content\less\japanesewhist.less" />
     <None Include="Properties\PublishProfiles\mailgames - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mailgames - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
@@ -519,6 +559,10 @@
       <Project>{93D3A47B-BAF9-4886-878F-1B34C5EC31AA}</Project>
       <Name>GameBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JapaneseWhist\JapaneseWhist.csproj">
+      <Project>{D4C06052-F025-4C91-A305-A2AE91D3C99B}</Project>
+      <Name>JapaneseWhist</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Othello\Othello.csproj">
       <Project>{F4767625-C5D7-4E55-8F39-786F2CC5B632}</Project>
       <Name>Othello</Name>
@@ -561,6 +605,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201311251157240_PlayerFullName.resx">
       <DependentUpon>201311251157240_PlayerFullName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201312031114471_JapaneseWhistMigration.resx">
+      <DependentUpon>201312031114471_JapaneseWhistMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -61,7 +61,8 @@ namespace MailGames.Controllers
                 IsCheck = board.Check,
                 CapturedPieces = state.CapturedPieces,
                 Moves = state.Moves,
-                Board = GetBoardViewModel(board)
+                Board = GetBoardViewModel(board),
+                Progress = ChessLogic.GetProgress(state, GameLogic.GetLoggedInPlayer(board)),
             });
         }
 

@@ -110,6 +110,8 @@ namespace MailGames.Logic
                     return new TicTacToeVisitor(board as TicTacToeBoard, TicTacToeVariant.Lufferschess);
                 case GameType.Othello:
                     return new OthelloVisitor(board as OthelloBoard);
+                case GameType.JapaneseWhist:
+                    return new JapaneseWhistVisitor(board as JapaneseWhistBoard);
                 default:
                     throw new ArgumentException("board");
             }
@@ -135,6 +137,7 @@ namespace MailGames.Logic
             return db.ChessBoards.ToArray()
                 .Concat(db.TicTacToeBoards.ToArray().OfType<IGameBoard>())
                 .Concat(db.OthelloBoards.ToArray().OfType<IGameBoard>())
+                .Concat(db.JapaneseWhistBoards.ToArray().OfType<IGameBoard>())
                 .ToArray();
         }
 
@@ -167,6 +170,8 @@ namespace MailGames.Logic
                 return (boardObj as TicTacToeBoard).Variant == TicTacToeVariant.Lufferschess ? GameType.CrissCross : GameType.TicTacToe;
             if (IsType<OthelloBoard>(type))
                 return GameType.Othello;
+            if (IsType<JapaneseWhistBoard>(type))
+                return GameType.JapaneseWhist;
             throw new ArgumentException("Unknown type: " + type);
         }
 

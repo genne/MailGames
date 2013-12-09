@@ -5,29 +5,50 @@
 .piece {
   font-family: Chess;
 }
+.piece.attacked {
+  text-shadow: 0px 0px 5px #790000;
+}
 .piece-pawn:after {
   font-family: Chess;
   content: 'o';
+}
+.piece-pawn:after.attacked {
+  text-shadow: 0px 0px 5px #790000;
 }
 .piece-knight:after {
   font-family: Chess;
   content: 'm';
 }
+.piece-knight:after.attacked {
+  text-shadow: 0px 0px 5px #790000;
+}
 .piece-bishop:after {
   font-family: Chess;
   content: 'v';
+}
+.piece-bishop:after.attacked {
+  text-shadow: 0px 0px 5px #790000;
 }
 .piece-rook:after {
   font-family: Chess;
   content: 't';
 }
+.piece-rook:after.attacked {
+  text-shadow: 0px 0px 5px #790000;
+}
 .piece-queen:after {
   font-family: Chess;
   content: 'w';
 }
+.piece-queen:after.attacked {
+  text-shadow: 0px 0px 5px #790000;
+}
 .piece-king:after {
   font-family: Chess;
   content: 'l';
+}
+.piece-king:after.attacked {
+  text-shadow: 0px 0px 5px #790000;
 }
 .piece-color-secondplayer {
   color: black;
@@ -40,7 +61,7 @@
 .chess-table {
   margin-bottom: 20px;
 }
-.chess-table td {
+.chess-table td:not(.position-id) {
   width: 35px;
   height: 35px;
   border: 1px solid black;
@@ -48,39 +69,40 @@
   vertical-align: middle;
   font-size: 0px;
 }
-.chess-table td .piece {
+.chess-table td:not(.position-id) .piece {
   font-size: 23.333333333333332px;
 }
-.chess-table td .piece.selectable {
+.chess-table td:not(.position-id) .piece.selectable {
   cursor: pointer;
 }
-.chess-table td .piece.selectable:hover {
+.chess-table td:not(.position-id) .piece.selectable:hover {
   text-shadow: -1px -1px 0 #790000, 1px -1px 0 #790000, -1px 1px 0 #790000, 1px 1px 0 #790000;
 }
-.chess-table td .piece.selectable.selected {
+.chess-table td:not(.position-id) .piece.selectable.selected {
   text-shadow: -1px -1px 0 #00016a, 1px -1px 0 #00016a, -1px 1px 0 #00016a, 1px 1px 0 #00016a;
 }
-.chess-table td .piece.attacked {
-  text-shadow: 0px 0px 5px #790000;
-}
-.chess-table td.cell-white {
+.chess-table td:not(.position-id).cell-white {
   background-color: lightgrey;
 }
-.chess-table td.cell-black {
+.chess-table td:not(.position-id).cell-black {
   background-color: darkgrey;
 }
-.chess-table td.available-target {
+.chess-table td:not(.position-id).available-target {
   background: lightblue;
   cursor: pointer;
 }
-.chess-table td.selected-target {
+.chess-table td:not(.position-id).selected-target {
   background: lightgreen;
+}
+.chess-table .position-id {
+  text-align: center;
+  padding-left: 5px;
 }
 @media (min-width: 768px) {
   .chess-table {
     margin-bottom: 20px;
   }
-  .chess-table td {
+  .chess-table td:not(.position-id) {
     width: 70px;
     height: 70px;
     border: 1px solid black;
@@ -88,33 +110,34 @@
     vertical-align: middle;
     font-size: 0px;
   }
-  .chess-table td .piece {
+  .chess-table td:not(.position-id) .piece {
     font-size: 46.666666666666664px;
   }
-  .chess-table td .piece.selectable {
+  .chess-table td:not(.position-id) .piece.selectable {
     cursor: pointer;
   }
-  .chess-table td .piece.selectable:hover {
+  .chess-table td:not(.position-id) .piece.selectable:hover {
     text-shadow: -1px -1px 0 #790000, 1px -1px 0 #790000, -1px 1px 0 #790000, 1px 1px 0 #790000;
   }
-  .chess-table td .piece.selectable.selected {
+  .chess-table td:not(.position-id) .piece.selectable.selected {
     text-shadow: -1px -1px 0 #00016a, 1px -1px 0 #00016a, -1px 1px 0 #00016a, 1px 1px 0 #00016a;
   }
-  .chess-table td .piece.attacked {
-    text-shadow: 0px 0px 5px #790000;
-  }
-  .chess-table td.cell-white {
+  .chess-table td:not(.position-id).cell-white {
     background-color: lightgrey;
   }
-  .chess-table td.cell-black {
+  .chess-table td:not(.position-id).cell-black {
     background-color: darkgrey;
   }
-  .chess-table td.available-target {
+  .chess-table td:not(.position-id).available-target {
     background: lightblue;
     cursor: pointer;
   }
-  .chess-table td.selected-target {
+  .chess-table td:not(.position-id).selected-target {
     background: lightgreen;
+  }
+  .chess-table .position-id {
+    text-align: center;
+    padding-left: 5px;
   }
 }
 /* Medium devices (desktops, 992px and up) */
@@ -124,4 +147,17 @@
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
   
+}
+.current-progress {
+  margin-top: 10px;
+}
+.current-progress .progress {
+  display: inline-block;
+  width: 50%;
+}
+.current-progress .progress:first-child {
+  border-radius: 4px 0px 0px 4px;
+}
+.current-progress .progress:last-child {
+  border-radius: 0px 4px 4px 0px;
 }
