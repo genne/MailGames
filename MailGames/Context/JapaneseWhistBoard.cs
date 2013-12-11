@@ -23,6 +23,7 @@ namespace MailGames.Context
         public int Id { get; set; }
         public PlayerDeck PlayerDeck { get; set; }
         public int CardIndex { get; set; }
+        public CardColor? Trumf { get; set; }
         public DateTime DateTime { get; set; }
     }
 }

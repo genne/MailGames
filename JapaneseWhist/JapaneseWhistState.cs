@@ -10,6 +10,7 @@ namespace JapaneseWhist
         public Random Random { get; set; }
         private Dictionary<GamePlayer, Dictionary<PlayerDeck, Deck>> _playerCards = new Dictionary<GamePlayer, Dictionary<PlayerDeck, Deck>>();
         private Dictionary<GamePlayer, int> _points = GameBaseLogic.GetAllPlayers().ToDictionary(x => x, x => 0);
+        private CardColor? _currentTrumf;
 
         public GamePlayer CurrentPlayer { get; set; }
         public GamePlayer StartingPlayer { get; set; }
@@ -64,6 +65,16 @@ namespace JapaneseWhist
         public void AddPoints(GamePlayer gamePlayer, int points)
         {
             _points[gamePlayer] += points;
+        }
+
+        public void SetCurrentTrumf(CardColor? cardColor)
+        {
+            _currentTrumf = cardColor;
+        }
+
+        public CardColor? GetCurrentTrumf()
+        {
+            return _currentTrumf;
         }
     }
 

@@ -78,8 +78,7 @@ namespace MailGames.Controllers
             board.FirstPlayer = PlayerManager.FindOrCreatePlayer(yourmail, db);
             board.SecondPlayer = PlayerManager.FindOrCreatePlayer(opponentsmail, db);
             db.SaveChanges();
-            string controller = GameLogic.GetController(board);
-            return RedirectToAction("Game", controller, new { id = board.Id });
+            return RedirectToAction("Game", GameLogic.GetController(board), new { id = board.Id });
         }
 
         public ActionResult Rematch(Guid id, GameType gameType)
@@ -107,7 +106,7 @@ namespace MailGames.Controllers
                 board.LastReminded = DateTime.Now;
             }
             db.SaveChanges();
-            return RedirectToAction("Game", gametype.ToString(), new{ id });
+            return RedirectToAction("Game", GameLogic.GetController(gametype), new{ id });
         }
 
         public ActionResult Surrender(Guid id, GameType gameType)
@@ -120,7 +119,7 @@ namespace MailGames.Controllers
 
             SendOpponentMail(db, board, "You won the game, congratulations!", "Opponent resigned");
 
-            return RedirectToAction("Game", gameType.ToString(), new { id });
+            return RedirectToAction("Game", GameLogic.GetController(gameType), new { id });
         }
 
         public ActionResult User(int id)

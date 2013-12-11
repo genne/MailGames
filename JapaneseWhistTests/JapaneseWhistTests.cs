@@ -39,6 +39,25 @@ namespace JapaneseWhistTests
         }
 
         [TestMethod]
+        public void TestSelectTriumf()
+        {
+            var state = new JapaneseWhistState(1);
+            Assert.IsNull(state.GetCurrentTrumf());
+            const CardColor trumf = CardColor.Heart;
+            JapaneseWhistLogic.SelectTrumf(state, trumf);
+            Assert.AreEqual(trumf, state.GetCurrentTrumf());
+
+            var card = PlayAnyCard(state);
+            Assert.AreNotEqual(trumf, card.Color);
+            Assert.IsTrue(state.GetPlayerDeck(GamePlayer.SecondPlayer, PlayerDeck.Visible).All().Any(c => c.Color == trumf));
+            var trumfCard = JapaneseWhistLogic.GetPlayableCardIndices(state).FirstOrDefault(i => JapaneseWhistLogic.GetCard(state, i).Color == trumf);
+            Assert.IsNotNull(trumfCard);
+            JapaneseWhistLogic.Select(state, trumfCard);
+
+            Assert.AreEqual(2, state.GetPlayerDeck(GamePlayer.SecondPlayer, PlayerDeck.LastStick).Count());
+        }
+
+        [TestMethod]
         public void TestTakeStick()
         {
             var state = new JapaneseWhistState(1);

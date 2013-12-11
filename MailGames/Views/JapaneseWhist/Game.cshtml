@@ -1,16 +1,35 @@
-﻿@using JapaneseWhist
+﻿@using GameBase
+@using JapaneseWhist
 @using MailGames.Models
 @model MailGames.Models.JapaneseWhistGameViewModel
 
 @{
     Layout = "~/Views/Shared/_Game.cshtml";
 }
-
-<small>Current stick</small>
-@Html.Partial("_VisibleCards", new VisibleCardsViewModel
+@if (Model.SelectTrumf && Model.State == GameState.YourTurn)
 {
-    Deck = Model.CurrentStick
-})
+    <div class="trumf-selector">
+        <h2>Select trumf</h2>
+        <div class="visible-cards">
+            @foreach (var color in Enum.GetValues(typeof (CardColor)).OfType<CardColor>())
+            {
+                <div class="card-holder">
+                    <a href="@Url.Action("SelectTrumf", new{ Model.Id, trumf = color })" class="visible-card color-@color.ToString().ToLower() selectable">
+                        <div class="card-color large"></div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+}
+@if (!Model.SelectTrumf)
+{
+    <small>Current stick</small>
+    @Html.Partial("_VisibleCards", new VisibleCardsViewModel
+    {
+        Deck = Model.CurrentStick
+    })
+}
 
 <br/>
 <small>Opponent's cards</small>
@@ -30,41 +49,66 @@
 </div>
 <br/>
 <div class="cards-stacked2">
-@if (Model.CanPlayFromHand)
-{
-    @Html.Partial("_VisibleCards", new VisibleCardsViewModel
+    @if (Model.CanPlayFromHand)
     {
-        Deck = Model.PlayerHandCards, 
-        SelectUrl = i => Model.SelectableHandCards.Contains(i) ? Url.Action("Select", new{ Model.Id, deck = PlayerDeck.Hand, index = i}) : null
-    })
-}
-else
-{
-    <small>Hand cards aren't playable first round...</small>
-    @Html.Partial("_HiddenCards", Model.PlayerHandCards)
-}
+        @Html.Partial("_VisibleCards", new VisibleCardsViewModel
+        {
+            Deck = Model.PlayerHandCards, 
+            SelectUrl = i => Model.SelectableHandCards.Contains(i) ? Url.Action("Select", new{ Model.Id, deck = PlayerDeck.Hand, index = i}) : null
+        })
+    }
+    else
+    {
+        <small>Hand cards aren't playable first round...</small>
+        @Html.Partial("_HiddenCards", Model.PlayerHandCards)
+    }
 </div>
 
 @section moves
 {
-    <p>Opponent hand cards: @Model.OpponentHandCards.Count()</p>
-    <h2>Score</h2>
-    <h3><small>You</small> <span class="label label-success">@Model.PlayerTotalScore</span> <small>Opponent</small> <span class="label label-danger">@Model.OpponentTotalScore</span></h3>
+    <table class="table">
+        <tr><th style="width: 25%">Trumf</th><th>Opponent hand cards</th><th>Your score</th><th>Opponent score</th></tr>
+        <tr style="font-size: 50px;"><td>
+                @if (Model.CurrentTrumf.HasValue)
+                {
+                    <div class="visible-cards">
+                        <div class="card-holder">
+                            <div class="visible-card color-@Model.CurrentTrumf.Value.ToString().ToLower() selectable">
+                                <div class="card-color large"></div>
+                            </div>
+                        </div>
+                    </div>
+                }
 
-    <h2>Your sticks</h2>
-    <div class="cards-stacked pull-left">
-        @Html.Partial("_HiddenCards", Model.PlayerSticks)
-    </div>
-    <div class="cards-random">
-        @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.PlayerLastStick })
-    </div>
-
-    <h2>Opponent sticks</h2>
-    <div class="cards-stacked pull-left">
-        @Html.Partial("_HiddenCards", Model.OpponentSticks)
-    </div>
-    <div class="cards-random">
-        @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.OpponentLastStick })
+            </td>
+            <td>
+                @Model.OpponentHandCards.Count()
+            </td>
+            <td><span class="label label-success">@Model.PlayerTotalScore</span></td>
+            <td><span class="label label-danger">@Model.OpponentTotalScore</span></td>
+        </tr>
+    </table>
+    
+    <div class="row">
+        <div class="col-md-6">
+        <h2>Your sticks</h2>
+        <div class="cards-stacked pull-left">
+            @Html.Partial("_HiddenCards", Model.PlayerSticks)
+        </div>
+            <div class="cards-random">
+                @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.PlayerLastStick })
+            </div>
+            </div>
+        
+        <div class="col-md-6">
+            <h2>Opponent sticks</h2>
+            <div class="cards-stacked pull-left">
+                @Html.Partial("_HiddenCards", Model.OpponentSticks)
+            </div>
+            <div class="cards-random">
+                @Html.Partial("_VisibleCards", new VisibleCardsViewModel { Deck = Model.OpponentLastStick })
+            </div>
+        </div>
     </div>
 }
 

@@ -48,6 +48,10 @@
 .card-holder .visible-card.color-diamonds .card-color:after {
   content: '♦';
 }
+.card-holder .visible-card .card-color.large {
+  font-size: 49px;
+  text-align: center;
+}
 .card-holder .visible-card .card-value {
   font-size: 0.8em;
   text-align: center;

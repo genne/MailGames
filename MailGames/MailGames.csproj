@@ -321,6 +321,10 @@
     <Compile Include="Migrations\201312031114471_JapaneseWhistMigration.Designer.cs">
       <DependentUpon>201312031114471_JapaneseWhistMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201312101303205_JapaneseWhistTrumfSelector.cs" />
+    <Compile Include="Migrations\201312101303205_JapaneseWhistTrumfSelector.Designer.cs">
+      <DependentUpon>201312101303205_JapaneseWhistTrumfSelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PlayerManager.cs" />
@@ -608,6 +612,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201312031114471_JapaneseWhistMigration.resx">
       <DependentUpon>201312031114471_JapaneseWhistMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201312101303205_JapaneseWhistTrumfSelector.resx">
+      <DependentUpon>201312101303205_JapaneseWhistTrumfSelector.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

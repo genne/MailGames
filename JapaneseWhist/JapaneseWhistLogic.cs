@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GameBase;
 
 namespace JapaneseWhist
@@ -32,7 +29,7 @@ namespace JapaneseWhist
             {
                 MoveLastStickToSticks(state);
 
-                var stickWinner = FirstPlayerTookStick(state.CurrentStick)
+                var stickWinner = FirstPlayerTookStick(state.CurrentStick, state.GetCurrentTrumf())
                                       ? GameBaseLogic.GetNextPlayer(state.CurrentPlayer)
                                       : state.CurrentPlayer;
                 state.CurrentStick.MoveAllTo(state.GetPlayerDeck(stickWinner, PlayerDeck.LastStick));
@@ -49,6 +46,7 @@ namespace JapaneseWhist
                         state.AddPoints(GamePlayer.SecondPlayer, 13 - firstPlayerStickCount);
 
                     state.CurrentPlayer = state.StartingPlayer = GameBaseLogic.GetNextPlayer(state.StartingPlayer);
+                    state.SetCurrentTrumf(null);
 
                     state.DealCards();
                 }
@@ -74,31 +72,8 @@ namespace JapaneseWhist
 
         private static void ValidateCard(JapaneseWhistState state, PlayerDeck playerDeck, int index)
         {
-            if (playerDeck != PlayerDeck.Hand && playerDeck != PlayerDeck.Visible) 
-                throw new InvalidOperationException("Invalid player deck");
-            if (playerDeck == PlayerDeck.Hand && IsFirstStick(state)) 
-                throw new InvalidOperationException("Can't play from hand cards now");
-            if (playerDeck == PlayerDeck.Hidden &&
-                state.GetPlayerDeck(state.CurrentPlayer, PlayerDeck.Visible).Get(index) != null)
-                throw new InvalidOperationException("Can't play hidden card until visible is taken");
-            if (state.CurrentStick.Count() == 1)
-            {
-                var currentColor = state.CurrentStick.Get(0).Color;
-                if (state.GetPlayerDeck(state.CurrentPlayer, playerDeck).Get(index).Color != currentColor)
-                {
-                    bool playerHasNoCardsOfSameColor = GetAllPlayableCards(state).Any(c => c.Color == currentColor);
-                    if (playerHasNoCardsOfSameColor) throw new InvalidOperationException("Must play same color");
-                }
-            }
-        }
-
-        private static IEnumerable<Card> GetAllPlayableCards(JapaneseWhistState state)
-        {
-            var cards = new List<Card>();
-            if (!IsFirstStick(state))
-                cards.AddRange(state.GetPlayerDeck(state.CurrentPlayer, PlayerDeck.Hand).All());
-            cards.AddRange(state.GetPlayerDeck(state.CurrentPlayer, PlayerDeck.Visible).All());
-            return cards;
+            if (!GetPlayableCardIndices(state).Any(d => d.PlayerDeck == playerDeck && d.Index == index))
+                throw new InvalidOperationException("Can't play that card");
         }
 
         private static bool IsFirstStick(JapaneseWhistState state)
@@ -106,10 +81,14 @@ namespace JapaneseWhist
             return GameBaseLogic.GetAllPlayers().All(p => state.GetPlayerDeck(p, PlayerDeck.LastStick).Count() == 0);
         }
 
-        private static bool FirstPlayerTookStick(Deck currentStick)
+        private static bool FirstPlayerTookStick(Deck currentStick, CardColor? trumf)
         {
             var baseCard = currentStick.Get(0);
             var otherCard = currentStick.Get(1);
+            if (otherCard.Color == trumf)
+            {
+                return baseCard.Color == trumf && baseCard.HasHigherValueThan(otherCard);
+            }
             return otherCard.Color != baseCard.Color || baseCard.HasHigherValueThan(otherCard);
         }
 
@@ -119,7 +98,13 @@ namespace JapaneseWhist
             if (state.CurrentStick.Count() > 0)
             {
                 var currentColor = state.CurrentStick.Get(0).Color;
-                var cardsOfSameColor = allVisibleCards.Where(c => GetCard(state, c).Color == currentColor);
+                var validColors = new HashSet<CardColor>{ currentColor };
+                var currentTrumf = state.GetCurrentTrumf();
+                if (currentTrumf.HasValue)
+                {
+                    validColors.Add(currentTrumf.Value);
+                }
+                var cardsOfSameColor = allVisibleCards.Where(c => validColors.Contains(GetCard(state, c).Color)).ToArray();
                 if (cardsOfSameColor.Any())
                     return cardsOfSameColor;
             }
@@ -131,7 +116,7 @@ namespace JapaneseWhist
             return state.GetPlayerDeck(state.CurrentPlayer, playerDeckIndex.PlayerDeck).Get(playerDeckIndex.Index);
         }
 
-        private static IEnumerable<PlayerDeckIndex> GetAllVisibleCards(JapaneseWhistState state)
+        private static List<PlayerDeckIndex> GetAllVisibleCards(JapaneseWhistState state)
         {
             var cards = new List<PlayerDeckIndex>();
             if (!IsFirstStick(state))
@@ -150,12 +135,20 @@ namespace JapaneseWhist
 
         public static GamePlayer? GetWinner(JapaneseWhistState state)
         {
+// ReSharper disable PossibleInvalidOperationException
             return GameBaseLogic.GetAllPlayers().OfType<GamePlayer?>().FirstOrDefault(p => state.GetPoints(p.Value) >= 10);
+// ReSharper restore PossibleInvalidOperationException
         }
 
         public static bool CanPlayFromHand(JapaneseWhistState state)
         {
             return !IsFirstStick(state);
+        }
+
+        public static void SelectTrumf(JapaneseWhistState state, CardColor cardColor)
+        {
+            if (state.GetCurrentTrumf() != null) throw new InvalidOperationException("Can't set trumf color now");
+            state.SetCurrentTrumf(cardColor);
         }
     }
 }

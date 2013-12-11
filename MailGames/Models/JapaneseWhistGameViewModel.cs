@@ -37,5 +37,9 @@ namespace MailGames.Models
 
         public Deck PlayerLastStick { get; set; }
         public Deck OpponentLastStick { get; set; }
+
+        public bool SelectTrumf { get; set; }
+
+        public CardColor? CurrentTrumf { get; set; }
     }
 }

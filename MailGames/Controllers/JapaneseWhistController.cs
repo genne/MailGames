@@ -25,7 +25,7 @@ namespace MailGames.Controllers
             var state = JapaneseWhistConversion.GetState(board);
             var player = GameLogic.GetLoggedInPlayer(board);
             var opponent = GameBaseLogic.GetNextPlayer(player);
-            var selectableCards = state.CurrentPlayer == player ? JapaneseWhistLogic.GetPlayableCardIndices(state).ToArray() : new PlayerDeckIndex[0];
+            var selectableCards = state.CurrentPlayer == player && state.GetCurrentTrumf() != null ? JapaneseWhistLogic.GetPlayableCardIndices(state).ToArray() : new PlayerDeckIndex[0];
             var model = new JapaneseWhistGameViewModel(board)
             {
                 CanPlayFromHand = JapaneseWhistLogic.CanPlayFromHand(state),
@@ -43,7 +43,9 @@ namespace MailGames.Controllers
                 PlayerTotalScore = state.GetPoints(player),
                 OpponentTotalScore = state.GetPoints(opponent),
                 PlayerLastStick = state.GetPlayerDeck(player, PlayerDeck.LastStick),
-                OpponentLastStick = state.GetPlayerDeck(opponent, PlayerDeck.LastStick)
+                OpponentLastStick = state.GetPlayerDeck(opponent, PlayerDeck.LastStick),
+                SelectTrumf = state.GetCurrentTrumf() == null,
+                CurrentTrumf = state.GetCurrentTrumf()
             };
             return View(model);
         }
@@ -52,16 +54,31 @@ namespace MailGames.Controllers
         {
             var db = new MailGamesContext();
             var board = db.JapaneseWhistBoards.Find(id);
+            JapaneseWhistLogic.Select(JapaneseWhistConversion.GetState(board), deck, index); // Verify action before saving
             board.Moves.Add(new JapaneseWhistMove
             {
                 CardIndex = index,
                 PlayerDeck = deck,
                 DateTime = DateTime.Now
             });
-            JapaneseWhistConversion.GetState(board); // Verify action before saving
             db.SaveChanges();
 
             SendOpponentMail(db, board);
+
+            return RedirectToAction("Game", new {id});
+        }
+
+        public ActionResult SelectTrumf(Guid id, CardColor trumf)
+        {
+            var db = new MailGamesContext();
+            var board = db.JapaneseWhistBoards.Find(id);
+            JapaneseWhistLogic.SelectTrumf(JapaneseWhistConversion.GetState(board), trumf); // Validate
+            board.Moves.Add(new JapaneseWhistMove
+            {
+                Trumf = trumf,
+                DateTime = DateTime.Now
+            });
+            db.SaveChanges();
 
             return RedirectToAction("Game", new {id});
         }

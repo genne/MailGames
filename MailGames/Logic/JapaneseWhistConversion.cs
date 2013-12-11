@@ -10,7 +10,14 @@ namespace MailGames.Logic
             var state = new JapaneseWhistState(japaneseWhistBoard.Seed);
             foreach (var move in japaneseWhistBoard.Moves)
             {
-                JapaneseWhistLogic.Select(state, move.PlayerDeck, move.CardIndex);
+                if (move.Trumf.HasValue)
+                {
+                    JapaneseWhistLogic.SelectTrumf(state, move.Trumf.Value);
+                }
+                else
+                {
+                    JapaneseWhistLogic.Select(state, move.PlayerDeck, move.CardIndex);
+                }
             }
             return state;
         }
