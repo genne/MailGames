@@ -223,6 +223,12 @@
     <Content Include="Content\less\chess.min.css">
       <DependentUpon>chess.less</DependentUpon>
     </Content>
+    <Content Include="Content\less\code.css">
+      <DependentUpon>code.less</DependentUpon>
+    </Content>
+    <Content Include="Content\less\code.min.css">
+      <DependentUpon>code.less</DependentUpon>
+    </Content>
     <Content Include="Content\less\colors.css">
       <DependentUpon>colors.less</DependentUpon>
     </Content>
@@ -325,6 +331,10 @@
     <Compile Include="Migrations\201312101303205_JapaneseWhistTrumfSelector.Designer.cs">
       <DependentUpon>201312101303205_JapaneseWhistTrumfSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201312111231259_RankingMigration.cs" />
+    <Compile Include="Migrations\201312111231259_RankingMigration.Designer.cs">
+      <DependentUpon>201312111231259_RankingMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PlayerManager.cs" />
@@ -348,6 +358,7 @@
     <Compile Include="Models\GameTicTacToeViewModel.cs" />
     <Compile Include="Models\GameViewModel.cs" />
     <Compile Include="Models\GameOthelloViewModel.cs" />
+    <Compile Include="Models\HomeGameRankingsViewModel.cs" />
     <Compile Include="Models\JapaneseWhistGameViewModel.cs" />
     <Compile Include="Models\StartGameHomeViewModel.cs" />
     <Compile Include="Models\UserHomeViewModel.cs" />
@@ -397,6 +408,8 @@
       <DependentUpon>variables.less</DependentUpon>
     </Content>
     <Content Include="Scripts\chess.js" />
+    <TypeScriptCompile Include="Scripts\game.ts" />
+    <Content Include="Scripts\game.js" />
     <Content Include="Views\Shared\_Game.cshtml" />
     <Content Include="Views\Home\User.cshtml" />
     <Content Include="Views\Othello\Game.cshtml" />
@@ -404,6 +417,7 @@
     <Content Include="Views\JapaneseWhist\Game.cshtml" />
     <Content Include="Views\JapaneseWhist\_HiddenCards.cshtml" />
     <Content Include="Views\JapaneseWhist\_VisibleCards.cshtml" />
+    <Content Include="Views\Home\GameRankings.cshtml" />
     <TypeScriptCompile Include="Scripts\site.ts" />
     <Content Include="Content\less\tictactoe.less" />
     <Content Include="Content\less\chess.less" />
@@ -414,6 +428,7 @@
     <Content Include="Content\less\card.less" />
     <Content Include="Content\less\utils.less" />
     <Content Include="Content\less\japanesewhist.less" />
+    <Content Include="Content\less\code.less" />
     <None Include="Properties\PublishProfiles\mailgames - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mailgames - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
@@ -615,6 +630,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201312101303205_JapaneseWhistTrumfSelector.resx">
       <DependentUpon>201312101303205_JapaneseWhistTrumfSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201312111231259_RankingMigration.resx">
+      <DependentUpon>201312111231259_RankingMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,5 +1,6 @@
 /// <reference path="typings/jquery/jquery.d.ts"/>
 /// <reference path="typings/bootstrap/bootstrap.d.ts"/>
+/// <reference path="game.ts"/>
 $(function () {
     var rand = Math.random();
     var currentTableCell = null;
@@ -11,15 +12,12 @@ $(function () {
             callbackFunction($(ev.currentTarget).attr("data-piece-type"));
         });
     };
-    var activateMoveButton = function (url) {
-        $(".code-move-button").attr("href", url).removeClass("disabled");
-    };
     var clearCurrentTableCell = function () {
         if (currentTableCell != null) {
             currentTableCell.removeClass("selected-target");
             currentTableCell = null;
         }
-        $(".code-move-button").addClass("disabled");
+        Game.resetMoveButton();
     };
     var highlightAvailableCells = function (p) {
         var chessTable = p.closest(".chess-table");
@@ -46,7 +44,7 @@ $(function () {
                             window.location.href = moveUrl + "&convertPawnTo=" + convertPawnTo;
                         });
                     } else {
-                        activateMoveButton(moveUrl);
+                        Game.activateMoveButton(moveUrl);
                     }
                 });
             });

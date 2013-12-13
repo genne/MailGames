@@ -1,4 +1,13 @@
-﻿.rotate(@degrees)
+﻿.stroke(@color)
+{ 
+    text-shadow:
+        -1px -1px 0 @color,
+        1px -1px 0 @color,
+        -1px 1px 0 @color,
+        1px 1px 0 @color; 
+}
+
+.rotate(@degrees)
 {
     transform:rotate(@degrees);
     -ms-transform:rotate(@degrees); /* IE 9 */

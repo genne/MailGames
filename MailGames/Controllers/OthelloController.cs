@@ -54,7 +54,7 @@ namespace MailGames.Controllers
                 DateTime = DateTime.Now
             });
 
-            boardObj.WinnerState = OthelloLogic.GetWinner(currentState);
+            GameLogic.UpdateWinnerState(boardObj);
 
             db.SaveChanges();
 

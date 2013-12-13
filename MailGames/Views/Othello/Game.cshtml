@@ -7,7 +7,7 @@
     Layout = "~/Views/Shared/_Game.cshtml";
 }
 
-<table class="othello-board">
+<table class="othello-board code-grid player-@Model.OthelloState.CurrentPlayer.ToString().ToLower()">
     @for (int y = 0; y < OthelloLogic.Size; y++)
     {
         <tr>
@@ -35,5 +35,4 @@
 
 @section scripts
 {
-    <script src="/Scripts/othello.js"></script>
 }

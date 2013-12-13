@@ -11,3 +11,6 @@
   border: 1px dashed black;
   border-radius: 2px;
 }
+.code-use-move-button a.selected {
+  box-shadow: 0px 0px 6px black;
+}

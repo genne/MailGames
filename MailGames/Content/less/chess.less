@@ -1,17 +1,9 @@
 ﻿@import "variables.less";
 @import "colors.less";
+@import "utils.less";
 
 @hover-color: @red;
 @selected-color: @blue;
-
-.stroke(@color)
-{ 
-    text-shadow:
-        -1px -1px 0 @color,
-        1px -1px 0 @color,
-        -1px 1px 0 @color,
-        1px 1px 0 @color; 
-}
 
 @font-face {
   font-family: 'Chess';
@@ -69,19 +61,16 @@
     .stroke(darken(gray, 10%));
 }
 
-.chess-table-base(@cellsize) {
+.chess-table {
     margin-bottom: 20px;
 
     td:not(.position-id) {
-        width: @cellsize;
-        height: @cellsize;
         border: 1px solid black;
         text-align: center;
         vertical-align: middle;
         font-size: 0px;
 
         .piece {
-            font-size: @cellsize / 1.5;
 
             &.selectable {
                 cursor: pointer;
@@ -118,26 +107,6 @@
         text-align: center;
         padding-left: 5px;
     }
-}
-
-.chess-table
-{
-    .chess-table-base(35px);
-}
-
-@media (min-width: @screen-sm-min) { 
-    .chess-table
-    {
-        .chess-table-base(70px);
-    }
-}
-
-/* Medium devices (desktops, 992px and up) */
-@media (min-width: @screen-md-min) { 
-}
-
-/* Large devices (large desktops, 1200px and up) */
-@media (min-width: @screen-lg-min) { 
 }
 
 .current-progress{

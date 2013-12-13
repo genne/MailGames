@@ -1,4 +1,6 @@
-﻿.last-move {
+﻿@import "colors.less";
+
+.last-move {
     position: relative;
     &:after {
         content: '';
@@ -10,4 +12,10 @@
         border: 1px dashed black;
         border-radius: 2px;
     }
+}
+
+.code-use-move-button a.selected {
+    //border: 1px dashed black;
+    //background: @graylight;
+    box-shadow: 0px 0px 6px black;
 }

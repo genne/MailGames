@@ -1,4 +1,5 @@
-﻿@model MailGames.Models.UserHomeViewModel
+﻿@using MailGames.Logic
+@model MailGames.Models.UserHomeViewModel
 
 @{
     ViewBag.Title = Model.Name;
@@ -12,5 +13,19 @@
 
 @if (showLogin)
 {
-    <a href="@Url.Action("LoginUsingGuid", "Account", new{ Model.Guid })">Log in as</a>
+    <p><a href="@Url.Action("LoginUsingGuid", "Account", new{ Model.Guid })">Log in as</a></p>
 }
+
+<table class="table">
+    <tr><th>Game</th><th>Ranking</th><th>Num Won</th><th>Num Lost</th><th>Num Tie</th></tr>
+    @foreach (var gameRanking in Model.GameRankings)
+    {
+        <tr>
+            <td><a href="@Url.Action("GameRankings", new{ gameRanking.GameType })">@GameLogic.GetName(gameRanking.GameType)</a></td>
+            <td>@((int)gameRanking.Ranking)</td>
+            <td>@gameRanking.NumWon</td>
+            <td>@gameRanking.NumLost</td>
+            <td>@gameRanking.NumTie</td>
+        </tr>
+    }
+</table>

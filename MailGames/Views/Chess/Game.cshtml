@@ -30,7 +30,7 @@
     var dontRotateBoard = Model.Board.PlayerColor == GamePlayer.FirstPlayer;
 }
 
-<table class="chess-table" data-board="@Model.Id">
+<table class="chess-table code-grid" data-board="@Model.Id">
     @for (var origRow = 0; origRow < 8; origRow++ )
     {
         var row = dontRotateBoard ? origRow : 7 - origRow;
@@ -55,24 +55,20 @@
                     }
                 </td>
             }
-            <td class="position-id">@FormatRowPosition(row)</td>
+            <td class="position-id code-exclude-grid">@FormatRowPosition(row)</td>
         </tr>
     }
     <tr>
         @for (int origCol = 0; origCol < 8; origCol++)
         {
             var col = dontRotateBoard ? origCol : 7 - origCol;
-            <td class="position-id">@FormatColPosition(col)</td>
+            <td class="position-id code-exclude-grid">@FormatColPosition(col)</td>
         }
     </tr>
 </table>
 
 @if (Model.Board.CurrentColor == Model.Board.PlayerColor)
 {
-    <div class="">
-        <a href="#" class="btn btn-primary disabled code-move-button">Move</a>
-    </div>
-
     <div class="modal fade" id="pawn-upgrade-modal">
         <div class="modal-dialog">
             <div class="modal-content">

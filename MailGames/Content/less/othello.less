@@ -35,17 +35,13 @@
             border-radius: 50%;
         }
     }
-}
 
-.othello-board-base(@size) {
-    .othello-board td {
-        width: @size;
-        height: @size;
+    &.player-firstplayer a.selected
+    {
+        background: white;
     }
-}
-
-.othello-board-base(320px / 8);
-
-@media (min-width: @screen-sm-min) {
-    .othello-board-base(60px);
+    &.player-secondplayer a.selected
+    {
+        background: black;
+    }
 }

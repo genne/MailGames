@@ -58,5 +58,10 @@ namespace MailGames.Logic
         {
             return "Reversi";
         }
+
+        public void Remove(MailGamesContext db)
+        {
+            db.OthelloBoards.Remove(_othelloBoard);
+        }
     }
 }

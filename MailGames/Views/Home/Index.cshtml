@@ -4,7 +4,7 @@
 }
 
 <div class="jumbotron">
-    <h1>Hello, @Model.UserName!</h1>
+    <h1>Hello, <a href="@Url.Action("User", new{ Id = Model.UserId })">@Model.UserName</a>!</h1>
     <p>Welcome to Mail Games!</p>
     <p>
         <a class="btn btn-primary btn-lg" href="@Url.Action("StartGame")">Start new game »</a>

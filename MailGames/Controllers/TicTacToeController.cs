@@ -55,7 +55,9 @@ namespace MailGames.Controllers
                 Y = y,
                 DateTime = DateTime.Now
             });
-            board.WinnerState = TicTacToeLogic.GetWinner(state);
+
+            GameLogic.UpdateWinnerState(board);
+
             db.SaveChanges();
 
             if (board.WinnerState.HasValue)

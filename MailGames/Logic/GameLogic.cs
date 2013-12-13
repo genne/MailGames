@@ -13,7 +13,13 @@ namespace MailGames.Logic
 {
     public class GameLogic
     {
-        private static readonly TimeSpan PassivityDuration = TimeSpan.FromDays(1);
+        private static readonly TimeSpan PassivityDuration = TimeSpan.FromSeconds(1);
+
+        public static void UpdateWinnerState(IGameBoard board)
+        {
+            board.WinnerState = GetWinnerState(board);
+            UpdateRankings(board);
+        }
 
         public static IGameBoard GetBoard(MailGamesContext db, Guid id, GameType gametype)
         {
@@ -68,14 +74,6 @@ namespace MailGames.Logic
                 return winner == loggedInPlayer ? GameState.PlayerWon : GameState.OpponentWon;
             }
             return currentPlayer == loggedInPlayer ? GameState.YourTurn : GameState.OpponentsTurn;
-        }
-
-        public static Activity GetActivity(IEnumerable<DateTime> allMoves, IGameBoard board)
-        {
-            DateTime? lastMove = null;
-            if (allMoves.Any())
-                lastMove = allMoves.Max();
-            return GetActivity(lastMove, board);
         }
 
         public static GamePlayer GetLoggedInPlayer(IGameBoard boardObj)
@@ -143,18 +141,20 @@ namespace MailGames.Logic
 
         public static Activity GetActivity(IGameBoard gameBoard)
         {
-            return GetActivity(GetLastActive(gameBoard), gameBoard);
-        }
-
-        private static Activity GetActivity(DateTime? lastMove, IGameBoard board)
-        {
+            var lastMove = GetLastActive(gameBoard);
             if (!lastMove.HasValue) return Activity.Active;
-            var lastReminded = board.LastReminded;
+            var lastReminded = gameBoard.LastReminded;
             var lastActiveDate = lastReminded.HasValue && lastReminded.Value > lastMove ? lastReminded.Value : lastMove;
             var passive = DateTime.Now - lastActiveDate > PassivityDuration;
             if (!passive) return Activity.Active;
-            return board.LastReminded.HasValue ? Activity.PassiveLostGame : Activity.Passive;
-
+            if (gameBoard.LastReminded.HasValue)
+            {
+                var notEnoughMoves = GetVisitor(gameBoard).GetActivityDates().Count() < 2;
+                return notEnoughMoves 
+                    ? Activity.GameNeverStarted 
+                    : Activity.PassiveLostGame;
+            }
+            return Activity.Passive;
         }
 
         public static string GetName(GameType type)
@@ -203,6 +203,48 @@ namespace MailGames.Logic
         public static string GetWikipediaId(GameType gameType)
         {
             return GetVisitor(gameType).GetWikipediaId();
+        }
+
+        public static void UpdateRankings(IGameBoard boardObj)
+        {
+            if (boardObj.WinnerState == null) return;
+            var winner = GetWinner(boardObj.WinnerState.Value);
+            var gameType = GetGameType(boardObj);
+            var player1Ranking = GetRankingObject(boardObj.FirstPlayer, gameType);
+            var player2Ranking = GetRankingObject(boardObj.SecondPlayer, gameType);
+            if (winner == null)
+            {
+                var diff = RankingLogic.GetRankingUpdateWhenTie(player1Ranking.Ranking, player2Ranking.Ranking);
+                player1Ranking.Ranking += diff;
+                player2Ranking.Ranking -= diff;
+            }
+            else
+            {
+                var winnerRanking = winner.Value == GamePlayer.FirstPlayer ? player1Ranking : player2Ranking;
+                var looserRanking = winner.Value == GamePlayer.SecondPlayer ? player1Ranking : player2Ranking;
+                var diff = RankingLogic.GetRankingUpdateWhenWinning(winnerRanking.Ranking, looserRanking.Ranking);
+                winnerRanking.Ranking += diff;
+                looserRanking.Ranking -= diff;
+            }
+        }
+
+        private static PlayerGameRanking GetRankingObject(Player firstPlayer, GameType gameType)
+        {
+            var rankingObject = firstPlayer.Rankings.FirstOrDefault(r => r.GameType == gameType);
+            if (rankingObject == null)
+            {
+                rankingObject = new PlayerGameRanking
+                {
+                    GameType = gameType, Ranking = RankingLogic.DefaultRanking
+                };
+                firstPlayer.Rankings.Add(rankingObject);
+            }
+            return rankingObject;
+        }
+
+        public static void RemoveBoard(MailGamesContext db, IGameBoard board)
+        {
+            GetVisitor(board).Remove(db);
         }
     }
 }

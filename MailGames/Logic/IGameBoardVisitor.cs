@@ -15,5 +15,6 @@ namespace MailGames.Logic
         string GetController();
         WinnerState? GetWinnerState();
         string GetWikipediaId();
+        void Remove(MailGamesContext db);
     }
 }

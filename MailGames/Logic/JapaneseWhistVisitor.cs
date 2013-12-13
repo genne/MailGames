@@ -71,5 +71,10 @@ namespace MailGames.Logic
         {
             return "whist";
         }
+
+        public void Remove(MailGamesContext db)
+        {
+            db.JapaneseWhistBoards.Remove(_japaneseWhistBoard);
+        }
     }
 }

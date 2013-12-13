@@ -78,5 +78,10 @@ namespace MailGames.Logic
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public void Remove(MailGamesContext db)
+        {
+            db.TicTacToeBoards.Remove(_ticTacToeBoard);
+        }
     }
 }

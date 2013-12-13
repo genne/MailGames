@@ -6,8 +6,7 @@
     Layout = "~/Views/Shared/_Game.cshtml";
 }
 
-<div style="overflow: auto">
-<table class="tic-tac-toe-table" data-width="@Model.Colors.GetLength(0)">
+<table class="tic-tac-toe-table code-grid" data-width="@Model.Colors.GetLength(0)">
     @for (int y = 0; y < Model.Colors.GetLength(1); y++)
     {
         <tr>
@@ -28,4 +27,3 @@
         </tr>
     }
 </table>
-</div>

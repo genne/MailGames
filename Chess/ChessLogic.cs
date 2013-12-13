@@ -15,7 +15,7 @@ namespace Chess
             var piece = state.GetCell(sourceCell);
             var pos = Position.FromInt(sourceCell);
             var allTargets = GetAllMoves(piece, pos, state);
-            return allTargets.Where(t => !IsCheck(state, pos, t, state.CurrentPlayer)).Select(t => pos.Move(t).ToInt());
+            return allTargets.Where(t => !IsCheck(state, pos, t, state.CurrentPlayer)).Select(t => pos.Move(t).ToInt()).ToArray();
         }
 
         private static bool IsCheck(ChessState state, Position pos, Move move, GamePlayer color)
@@ -38,93 +38,137 @@ namespace Chess
 
         private static IEnumerable<Move> GetAllMoves(Piece piece, Position pos, ChessState state, bool attackOnly = false)
         {
-            var allDirections = (from i in new[] {-1, 0, 1} from j in new[] {-1, 0, 1} select new Move {DeltaCol = i, DeltaRow = j});
             switch (piece.PieceType)
             {
                 case PieceType.Pawn:
-                    var pawnStartRow = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : 6;
-                    var pawnDir = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : -1;
-                    if (!attackOnly && pos.Y == pawnStartRow) yield return new Move { DeltaRow = 2 * pawnDir };
-
-                    foreach (var directionalMove in new[]{ -1, 1 }.Select(d => new Move{ DeltaRow = pawnDir, DeltaCol = d }))
-                    {
-                        var position = pos.Move(directionalMove);
-                        if (IsOutside(position)) continue;
-                        int directionalMoveTarget = position.ToInt();
-                        if (state.GetCell(directionalMoveTarget) != null && state.GetCell(directionalMoveTarget).GamePlayer != piece.GamePlayer)
-                            yield return directionalMove;
-                    }
-                    if (!attackOnly)
-                    {
-                        var forwardMove = new Move {DeltaRow = 1*pawnDir};
-                        if (state.GetCell(pos.Move(forwardMove)) == null) yield return forwardMove;
-                    }
-                    break;
+                    return GetPawnMoves(piece, pos, state, attackOnly);
 
                 case PieceType.Knight:
-                    var moves = new List<Move>();
-                    foreach(var dx in new[]{ -1, 1})
-                    {
-                        foreach (var dy in new[] {-2, 2})
-                        {
-                            moves.Add(new Move { DeltaCol = dx, DeltaRow = dy });
-                            moves.Add(new Move { DeltaCol = dy, DeltaRow = dx });
-                        }
-                    }
-                    foreach (var move in moves)
-                    {
-                        if (GetTargetState(piece, pos, state, move) != TargetState.SelfOrOutside)
-                            yield return move;
-                    }
-                    break;
+                    return GetKnightMoves(piece, pos, state);
 
                 case PieceType.Bishop:
-                    var bishopDirections = new[]{ new Move{ DeltaCol = -1, DeltaRow = -1}, new Move{ DeltaCol = 1, DeltaRow = -1}, new Move{ DeltaCol = -1, DeltaRow = 1}, new Move{ DeltaCol = 1, DeltaRow = 1}};
-                    foreach (var move1 in AllMovesInDirections(piece, pos, state, bishopDirections)) yield return move1;
-                    break;
+                    return GetBishopMoves(piece, pos, state);
+
                 case PieceType.Rook:
-                    var rookDirections = new[]{ new Move{ DeltaCol = -1}, new Move{ DeltaCol = 1}, new Move{ DeltaRow = -1}, new Move{ DeltaRow = 1}};
-                    foreach (var move1 in AllMovesInDirections(piece, pos, state, rookDirections)) yield return move1;
-                    break;
+                    return GetRookMoves(piece, pos, state);
+
                 case PieceType.Queen:
-                    foreach (var move1 in AllMovesInDirections(piece, pos, state, allDirections)) yield return move1;
-                    break;
+                    return GetQueenMoves(piece, pos, state);
+
                 case PieceType.King:
-                    foreach (var move in allDirections)
-                    {
-                        if (GetTargetState(piece, pos, state, move) != TargetState.SelfOrOutside)
-                            yield return move;
-                    }
+                    return GetKingMoves(piece, pos, state, attackOnly);
 
-                    // Rockad
-                    if (!attackOnly)
-                    {
-                        var kingPos = FindPiece(state, PieceType.King, state.CurrentPlayer);
-                        if (!IsCheck(state, state.CurrentPlayer) && !HasMoved(state, kingPos))
-                        {
-                            foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentPlayer))
-                            {
-                                if (HasMoved(state, rookPos)) continue;
-
-                                var cellsBetween = GetCellsBetween(kingPos, rookPos, false);
-                                var rookDir = rookPos.X > kingPos.X ? 1 : -1;
-                                var kingMovement = new Move {DeltaCol = 2*rookDir};
-                                var kingTargetPos = kingPos.Move(kingMovement);
-                                var kingMovementCells = GetCellsBetween(kingPos, kingTargetPos, true);
-                                var isCellsBetweenAlreadyOccupied = cellsBetween.Any(c => state.GetCell(c) != null);
-                                var isKingMovementCellsAttacked =
-                                    kingMovementCells.Any(
-                                        kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentPlayer));
-                                if (!isCellsBetweenAlreadyOccupied
-                                    && !isKingMovementCellsAttacked)
-                                    yield return kingMovement;
-                            }
-                        }
-                    }
-
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static IEnumerable<Move> GetKingMoves(Piece piece, Position pos, ChessState state, bool attackOnly)
+        {
+            foreach (var move in AllDirections.Where(move => GetTargetState(piece, pos, state, move) != TargetState.SelfOrOutside))
+            {
+                yield return move;
+            }
+
+            // Rockad
+            if (attackOnly) yield break;
+
+            var kingPos = FindPiece(state, PieceType.King, state.CurrentPlayer);
+            if (!IsCheck(state, state.CurrentPlayer) && !HasMoved(state, kingPos))
+            {
+                foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentPlayer))
+                {
+                    if (HasMoved(state, rookPos)) continue;
+
+                    var cellsBetween = GetCellsBetween(kingPos, rookPos, false);
+                    var rookDir = rookPos.X > kingPos.X ? 1 : -1;
+                    var kingMovement = new Move {DeltaCol = 2*rookDir};
+                    var kingTargetPos = kingPos.Move(kingMovement);
+                    var kingMovementCells = GetCellsBetween(kingPos, kingTargetPos, true);
+                    var isCellsBetweenAlreadyOccupied = cellsBetween.Any(c => state.GetCell(c) != null);
+                    var isKingMovementCellsAttacked =
+                        kingMovementCells.Any(
+                            kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentPlayer));
+                    if (!isCellsBetweenAlreadyOccupied
+                        && !isKingMovementCellsAttacked)
+                        yield return kingMovement;
+                }
+            }
+        }
+
+        private static IEnumerable<Move> GetQueenMoves(Piece piece, Position pos, ChessState state)
+        {
+            return AllMovesInDirections(piece, pos, state, AllDirections);
+        }
+
+        private static IEnumerable<Move> GetRookMoves(Piece piece, Position pos, ChessState state)
+        {
+            var rookDirections = new[]
+            {
+                new Move {DeltaCol = -1}, 
+                new Move {DeltaCol = 1}, 
+                new Move {DeltaRow = -1}, 
+                new Move {DeltaRow = 1}
+            };
+            return AllMovesInDirections(piece, pos, state, rookDirections);
+        }
+
+        private static IEnumerable<Move> GetBishopMoves(Piece piece, Position pos, ChessState state)
+        {
+            var bishopDirections = new[]
+            {
+                new Move {DeltaCol = -1, DeltaRow = -1}, 
+                new Move {DeltaCol = 1, DeltaRow = -1},
+                new Move {DeltaCol = -1, DeltaRow = 1}, 
+                new Move {DeltaCol = 1, DeltaRow = 1}
+            };
+            return AllMovesInDirections(piece, pos, state, bishopDirections);
+        }
+
+        private static IEnumerable<Move> GetKnightMoves(Piece piece, Position pos, ChessState state)
+        {
+            var moves = new List<Move>();
+            foreach (var dx in new[] {-1, 1})
+            {
+                foreach (var dy in new[] {-2, 2})
+                {
+                    moves.Add(new Move {DeltaCol = dx, DeltaRow = dy});
+                    moves.Add(new Move {DeltaCol = dy, DeltaRow = dx});
+                }
+            }
+            return moves.Where(move => GetTargetState(piece, pos, state, move) != TargetState.SelfOrOutside);
+        }
+
+        private static IEnumerable<Move> GetPawnMoves(Piece piece, Position pos, ChessState state, bool attackOnly)
+        {
+            var pawnStartRow = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : 6;
+            var pawnDir = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : -1;
+            if (!attackOnly && pos.Y == pawnStartRow) yield return new Move {DeltaRow = 2*pawnDir};
+
+            foreach (var directionalMove in new[] {-1, 1}.Select(d => new Move {DeltaRow = pawnDir, DeltaCol = d}))
+            {
+                var position = pos.Move(directionalMove);
+                if (IsOutside(position)) continue;
+                var directionalMoveTarget = position.ToInt();
+                if (state.GetCell(directionalMoveTarget) != null &&
+                    state.GetCell(directionalMoveTarget).GamePlayer != piece.GamePlayer)
+                    yield return directionalMove;
+            }
+
+            if (attackOnly) yield break;
+
+            var forwardMove = new Move {DeltaRow = 1*pawnDir};
+            if (state.GetCell(pos.Move(forwardMove)) == null) yield return forwardMove;
+        }
+
+        private static IEnumerable<Move> AllDirections
+        {
+            get
+            {
+                return from i in new[] {-1, 0, 1} 
+                       from j in new[] {-1, 0, 1} 
+                       where i != 0 || j != 0
+                       select new Move {DeltaCol = i, DeltaRow = j};
             }
         }
 
@@ -168,19 +212,19 @@ namespace Chess
             return state.GetCells().Where(c => c.Value.GamePlayer == gamePlayer);
         }
 
-        private static Position FindPiece(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
+        private static Position FindPiece(ChessState state, PieceType pieceType, GamePlayer gamePlayer)
         {
-            return FindPieces(state, pieceType, GamePlayer).Single();
+            return FindPieces(state, pieceType, gamePlayer).Single();
         }
 
-        private static bool IsAttacked(ChessState state, PieceType pieceType, GamePlayer GamePlayer)
+        private static bool IsAttacked(ChessState state, PieceType pieceType, GamePlayer gamePlayer)
         {
-            return IsAttacked(state, FindPiece(state, pieceType, GamePlayer), GamePlayer);
+            return IsAttacked(state, FindPiece(state, pieceType, gamePlayer), gamePlayer);
         }
 
-        private static bool IsAttacked(ChessState state, Position position, GamePlayer GamePlayer)
+        private static bool IsAttacked(ChessState state, Position position, GamePlayer gamePlayer)
         {
-            var allOpponentPieces = state.GetCells().Where(c => c.Value.GamePlayer != GamePlayer);
+            var allOpponentPieces = state.GetCells().Where(c => c.Value.GamePlayer != gamePlayer);
             return
                 allOpponentPieces.Any(
                     p =>
@@ -323,10 +367,8 @@ namespace Chess
             {
                 case GamePlayer.FirstPlayer:
                     return WinnerState.FirstPlayer;
-                    break;
                 case GamePlayer.SecondPlayer:
                     return WinnerState.SecondPlayer;
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException("currentPlayer");
             }

@@ -78,25 +78,17 @@ namespace MailGames.Controllers
             {
                 From = from,
                 To = to,
-                PawnConversion = convertPawnTo.HasValue ? new[]{ new PawnConversion{ ConvertTo = convertPawnTo.Value }} : null,
+                PawnConversion = convertPawnTo.HasValue ? new[]{ new PawnConversion{ ConvertTo = convertPawnTo.Value }} : new PawnConversion[0],
                 DateTime = DateTime.Now
             });
 
-            bool isCheck;
-            boardObj.WinnerState = ChessLogic.GetWinnerState(currentState, out isCheck);
-            boardObj.Check = isCheck;
+            boardObj.Check = ChessLogic.IsCheck(currentState, currentState.CurrentPlayer);
+
+            GameLogic.UpdateWinnerState(boardObj);
 
             db.SaveChanges();
 
-            if (boardObj.WinnerState.HasValue)
-            {
-                SendOpponentMail(db, boardObj, "You lost the game :(",
-                         boardObj.WinnerState != WinnerState.Tie ? "Checkmate :(" : "Stalemate");
-            }
-            else if (isCheck)
-                SendOpponentMail(db, boardObj, "The opponent made a move and put you in check. Make your move!", "Check");
-            else
-                SendOpponentMail(db, boardObj, "It's your turn!", "Your turn!");
+            SendOpponentMail(db, boardObj);
 
             return RedirectToAction("Game", new {id = board});
         }
@@ -106,6 +98,7 @@ namespace MailGames.Controllers
     {
         Active,
         Passive,
-        PassiveLostGame
+        PassiveLostGame,
+        GameNeverStarted
     }
 }

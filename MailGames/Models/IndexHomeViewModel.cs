@@ -14,6 +14,8 @@ namespace MailGames.Models
         public IEnumerable<Game> OpponentTurnGames { get; set; }
         public IEnumerable<Game> FinishedGames { get; set; }
 
+        public int UserId { get; set; }
+
         public class Game
         {
             public GameType GameType { get; set; }

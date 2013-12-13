@@ -58,5 +58,10 @@ namespace MailGames.Logic
         {
             return "Chess";
         }
+
+        public void Remove(MailGamesContext db)
+        {
+            db.ChessBoards.Remove(_chessBoard);
+        }
     }
 }

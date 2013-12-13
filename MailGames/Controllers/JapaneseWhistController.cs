@@ -61,6 +61,9 @@ namespace MailGames.Controllers
                 PlayerDeck = deck,
                 DateTime = DateTime.Now
             });
+
+            GameLogic.UpdateWinnerState(board);
+
             db.SaveChanges();
 
             SendOpponentMail(db, board);

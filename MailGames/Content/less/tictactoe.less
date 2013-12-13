@@ -1,39 +1,18 @@
 ﻿@import "variables.less";
 
-.tic-tac-toe-table-base(@tttsize: 100px) {
-    width: 555px;
+.tic-tac-toe-table {
     margin-bottom: 10px;
     td{
-        width: @tttsize;
-        height: @tttsize;
         border: 1px solid black;
-        font-size: @tttsize / 2;
         text-align: center;
         vertical-align: middle;
 
         a{
             display: block;
             height: 100%;
+            box-sizing: content-box;
+            -moz-box-sizing: content-box;
+            -webkit-box-sizing: content-box;
         }
-    }
-}
-
-/*.tic-tac-toe-table[data-width="3"]
-{
-    .tic-tac-toe-table-base(260px / 3);
-}
-.tic-tac-toe-table[data-width="15"]
-{
-    .tic-tac-toe-table-base(260px / 15);
-}*/
-
-@media (min-width: 0px) { 
-    .tic-tac-toe-table[data-width="3"]
-    {
-        .tic-tac-toe-table-base(190px);
-    }
-    .tic-tac-toe-table[data-width="15"]
-    {
-        .tic-tac-toe-table-base(180px / 5);
     }
 }

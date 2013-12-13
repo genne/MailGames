@@ -50,3 +50,24 @@ $(".code-nice-date").each(function (i, e) {
     };
     update();
 });
+
+function updateGrids() {
+    $(".code-grid").each(function (i, e) {
+        var o = $(e);
+        o.width("auto");
+        var width = o.parent().width();
+        var excludeGridSelector = ".code-exclude-grid";
+        width -= o.find("tr").first().find(excludeGridSelector).outerWidth(true);
+        var tdSelector = "td:not(" + excludeGridSelector + ")";
+        var numCols = o.find("tr").first().find(tdSelector).length;
+        var cellSize = (width / numCols) - 4;
+        o.find(tdSelector).width(cellSize).height(cellSize).css("font-size", cellSize / 1.5);
+    });
+}
+
+$(window).resize(function () {
+    updateGrids();
+});
+$(function () {
+    updateGrids();
+});

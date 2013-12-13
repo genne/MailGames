@@ -41,13 +41,26 @@ namespace MailGames.Controllers
                     GameState = GameLogic.GetGameState(b.Board)
                 }
             }).ToArray();
+            var player = PlayerManager.GetCurrent(db);
             return View(new IndexHomeViewModel
             {
-                UserName = PlayerManager.GetPlayerName(PlayerManager.GetCurrent(db)),
+                UserName = PlayerManager.GetPlayerName(player),
                 YourTurnGames = games.Where(g => !g.Finished && g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
                 OpponentTurnGames = games.Where(g => !g.Finished && !g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
-                FinishedGames = games.Where(g => g.Finished).Select(g => g.Game).OrderByDescending(g => g.LastActive)
+                FinishedGames = games.Where(g => g.Finished).Select(g => g.Game).OrderByDescending(g => g.LastActive),
+                UserId = player.Id
             });
+        }
+
+        public void UpdateRankings()
+        {
+            var db = new MailGamesContext();
+            db.Database.ExecuteSqlCommand("delete from playergamerankings");
+            foreach (var board in GameLogic.GetAllBoards(db))
+            {
+                GameLogic.UpdateRankings(board);
+            }
+            db.SaveChanges();
         }
 
         public void UpdateStates()
@@ -55,7 +68,7 @@ namespace MailGames.Controllers
             var db = new MailGamesContext();
             foreach (var board in GameLogic.GetAllBoards(db).Where(board => board.WinnerState == null))
             {
-                board.WinnerState = GameLogic.GetWinnerState(board);
+                GameLogic.UpdateWinnerState(board);
             }
             db.SaveChanges();
         }
@@ -92,21 +105,34 @@ namespace MailGames.Controllers
         {
             var db = new MailGamesContext();
             var board = GameLogic.GetBoard(db, id, gametype);
-            var currentPlayer = GameLogic.GetCurrentPlayer(board);
-            if (board.LastReminded.HasValue)
+            var activity = GameLogic.GetActivity(board);
+            switch (activity)
             {
-                board.WinnerState = currentPlayer == GamePlayer.FirstPlayer
-                                        ? WinnerState.FirstPlayerPassive
-                                        : WinnerState.SecondPlayerPassive;
-                SendOpponentMail(db, board, "You lost the game because of inactivity", "Game lost :(");
-            }
-            else
-            {
-                SendOpponentMail(db, board, "I'm waiting for you to make a move...", "Still your turn!");
-                board.LastReminded = DateTime.Now;
+                case Activity.PassiveLostGame:
+                {
+                    var currentPlayer = GameLogic.GetCurrentPlayer(board);
+                    board.WinnerState = currentPlayer == GamePlayer.FirstPlayer
+                                            ? WinnerState.FirstPlayerPassive
+                                            : WinnerState.SecondPlayerPassive;
+
+                    GameLogic.UpdateRankings(board);
+
+                    SendOpponentMail(db, board, "You lost the game because of inactivity", "Game lost :(");
+                }
+                    break;
+                case Activity.GameNeverStarted:
+                    GameLogic.RemoveBoard(db, board);
+                    break;
+                default:
+                    SendOpponentMail(db, board, "I'm waiting for you to make a move...", "Still your turn!");
+                    board.LastReminded = DateTime.Now;
+                    break;
             }
             db.SaveChanges();
-            return RedirectToAction("Game", GameLogic.GetController(gametype), new{ id });
+
+            return activity == Activity.GameNeverStarted 
+                ? RedirectToAction("Index")
+                : RedirectToAction("Game", GameLogic.GetController(gametype), new{ id });
         }
 
         public ActionResult Surrender(Guid id, GameType gameType)
@@ -115,6 +141,9 @@ namespace MailGames.Controllers
             var board = GameLogic.GetBoard(db, id, gameType);
             var currentPlayer = GameLogic.EnsurePlayersTurn(board);
             board.WinnerState = currentPlayer == GamePlayer.FirstPlayer ? WinnerState.FirstPlayerResigned : WinnerState.SecondPlayerResigned;
+
+            GameLogic.UpdateRankings(board);
+
             db.SaveChanges();
 
             SendOpponentMail(db, board, "You won the game, congratulations!", "Opponent resigned");
@@ -124,11 +153,38 @@ namespace MailGames.Controllers
 
         public ActionResult User(int id)
         {
-            var model = new MailGamesContext().Players.Where(p => p.Id == id).ToArray().Select(p => new UserHomeViewModel
+            var db = new MailGamesContext();
+            var boards = GameLogic.GetAllBoards(db).Where(b => b.WinnerState.HasValue && (b.FirstPlayer.Id == id || b.SecondPlayer.Id == id)).ToArray();
+            var player1States = new[]{ WinnerState.FirstPlayer, WinnerState.SecondPlayerPassive, WinnerState.SecondPlayerResigned };
+            var player2States = new[]{WinnerState.SecondPlayer, WinnerState.FirstPlayerPassive, WinnerState.FirstPlayerResigned};
+            var model = db.Players.Where(p => p.Id == id).ToArray().Select(p => new UserHomeViewModel
             {
                 Guid = p.Guid,
-                Name = PlayerManager.GetPlayerName(p)
+                Name = PlayerManager.GetPlayerName(p),
+                GameRankings = p.Rankings.Select(r => new UserHomeViewModel.GameRanking
+                {
+                    GameType = r.GameType,
+                    Ranking = r.Ranking,
+                    NumLost = boards.Count(g => GameLogic.GetGameType(g) == r.GameType && (g.FirstPlayer.Id == id ? player2States.Contains(g.WinnerState.Value) : player1States.Contains(g.WinnerState.Value))),
+                    NumWon = boards.Count(g => GameLogic.GetGameType(g) == r.GameType && (g.FirstPlayer.Id == id ? player1States.Contains(g.WinnerState.Value) : player2States.Contains(g.WinnerState.Value))),
+                    NumTie = boards.Count(g => GameLogic.GetGameType(g) == r.GameType && g.WinnerState == WinnerState.Tie),
+                })
             }).Single();
+            return View(model);
+        }
+
+        public ActionResult GameRankings(GameType gametype)
+        {
+            var model = new HomeGameRankingsViewModel
+            {
+                GameType = gametype,
+                TopUsers = new MailGamesContext().Players.Select(p => new HomeGameRankingsViewModel.TopUser
+                {
+                    Id = p.Id,
+                    Name = p.FullName,
+                    Ranking = (float?)p.Rankings.FirstOrDefault(r => r.GameType == gametype).Ranking ?? 0
+                }).Where(p => p.Ranking != 0 && p.Name != null).OrderByDescending(p => p.Ranking)
+            };
             return View(model);
         }
     }

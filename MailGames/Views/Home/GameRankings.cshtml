@@ -1,0 +1,19 @@
+﻿@using MailGames.Logic
+@model MailGames.Models.HomeGameRankingsViewModel
+
+@{
+    ViewBag.Title = "Game Rankings";
+}
+
+<h2>@GameLogic.GetName(Model.GameType)</h2>
+
+<table class="table">
+    <tr><th>Player</th><th>Ranking</th></tr>
+    @foreach (var user in Model.TopUsers)
+    {
+        <tr>
+            <td>@Html.ActionLink(user.Name, "User", new{ user.Id })</td>
+            <td>@((int)user.Ranking)</td>
+        </tr>
+    }
+</table>
