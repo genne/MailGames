@@ -100,7 +100,7 @@ namespace MailGames.Controllers
                         Id = long.Parse(f.Id),
                         Name = f.Name,
                         FriendType = StartGameHomeViewModel.FriendType.Facebook
-                    }));
+                    }).OrderBy(f => f.Name));
             }
             return View(model);
         }

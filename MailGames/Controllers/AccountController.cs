@@ -279,6 +279,7 @@ namespace MailGames.Controllers
             else
             {
                 player = PlayerManager.FindOrCreatePlayer(db, mail);
+                db.SaveChanges();
                 OAuthWebSecurity.CreateOrUpdateAccount(providerName, providerUserId, mail);
                 OAuthWebSecurity.Login(providerName, providerUserId, false);    
             }

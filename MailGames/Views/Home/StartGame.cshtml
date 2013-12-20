@@ -21,13 +21,18 @@
         <label for="playedOpponent">Friend</label>
         <select name="playedOpponent" class="form-control">
             <option value="">[enter mail]</option>
-            @foreach (var friend in Model.PlayedOpponents)
+            @foreach (var friends in Model.PlayedOpponents.GroupBy(p => p.FriendType).OrderBy(p => p.Key))
             {
-                <option 
-                    data-fb-id="@(friend.FriendType == StartGameHomeViewModel.FriendType.Facebook ? friend.Id.ToString() : "")"
-                    value="@(friend.Id + "_" + friend.FriendType + "|" + friend.Name)">
-                    @friend.Name
-                </option>
+                <optgroup label="@friends.Key">
+                    @foreach (var friend in friends)
+                    {
+                        <option 
+                            data-fb-id="@(friend.FriendType == StartGameHomeViewModel.FriendType.Facebook ? friend.Id.ToString() : "")"
+                            value="@(friend.Id + "_" + friend.FriendType + "|" + friend.Name)">
+                            @friend.Name
+                        </option>
+                    }
+                </optgroup>
             }
         </select>
     </div>
