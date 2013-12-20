@@ -5,6 +5,7 @@ using System.Transactions;
 using System.Web.Mvc;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
+using Facebook;
 using MailGames.Context;
 using MailGames.Filters;
 using MailGames.Models;
@@ -19,6 +20,19 @@ namespace MailGames.Controllers
     {
         //
         // GET: /Account/Login
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ActionResult LoginFacebook(string signed_request)
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult LoginFacebookNonCanvas()
+        {
+            return ExternalLogin("facebook", "/");
+        }
 
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
@@ -95,10 +109,9 @@ namespace MailGames.Controllers
                 // Attempt to register the user
                 try
                 {
-                    WebSecurity.CreateUserAndAccount(model.UserName, model.Password);
-                    WebSecurity.Login(model.UserName, model.Password);
-
-                    RegisterMail(model.UserName, model.Mail);
+                    PlayerManager.CreatePlayer(model.Mail);
+                    WebSecurity.CreateAccount(model.Mail, model.Password);
+                    WebSecurity.Login(model.Mail, model.Password);
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -247,117 +260,31 @@ namespace MailGames.Controllers
                 Session["facebooktoken"] = result.ExtraData["accesstoken"];
             }
 
-            if (OAuthWebSecurity.Login(result.Provider, result.ProviderUserId, createPersistentCookie: false))
-            {
-                RegisterMail(result);
-                return RedirectToLocal(returnUrl);
-            }
+            LoginComplete(result.Provider, result.ProviderUserId, result.UserName, result.ExtraData.ContainsKey("name") ? result.ExtraData["name"] : null);
+            return RedirectToLocal(returnUrl);
+        }
 
-            if (User.Identity.IsAuthenticated)
+        private static void LoginComplete(string providerName, string providerUserId, string mail, string fullName)
+        {
+            var db = new MailGamesContext();
+            Player player;
+
+            if (OAuthWebSecurity.Login(providerName, providerUserId, createPersistentCookie: false))
             {
-                RegisterMail(result);
-                // If the current user is logged in add the new account
-                OAuthWebSecurity.CreateOrUpdateAccount(result.Provider, result.ProviderUserId, User.Identity.Name);
-                return RedirectToLocal(returnUrl);
+                var userName = OAuthWebSecurity.GetUserName(providerName, providerUserId);
+                player = db.Players.First(p => p.UserName == userName);
+                player.Mail = mail;
+                player.UserName = mail;
             }
             else
             {
-                var db = new MailGamesContext();
-                var player = db.Players.FirstOrDefault(p => p.Mail == result.UserName && p.UserName != null);
-                if (player != null)
-                {
-                    // If the current user is logged in add the new account
-                    OAuthWebSecurity.CreateOrUpdateAccount(result.Provider, result.ProviderUserId, player.UserName);
-                    return RedirectToLocal(returnUrl);
-                }
-                else
-                {
-                    // User is new, ask for their desired membership name
-                    string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
-                    ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(result.Provider).DisplayName;
-                    ViewBag.ReturnUrl = returnUrl;
-                    return View("ExternalLoginConfirmation",
-                                new RegisterExternalLoginModel
-                                {
-                                    UserName = result.UserName,
-                                    ExternalLoginData = loginData,
-                                    Mail = result.UserName
-                                });
-                }
+                player = PlayerManager.FindOrCreatePlayer(db, mail);
+                OAuthWebSecurity.CreateOrUpdateAccount(providerName, providerUserId, mail);
+                OAuthWebSecurity.Login(providerName, providerUserId, false);    
             }
-        }
 
-        private void RegisterMail(AuthenticationResult result)
-        {
-            var providerName = result.Provider;
-            var providerUserId = result.ProviderUserId;
-            var mail = result.UserName;
-            RegisterMail(providerName, providerUserId, mail);
-        }
-
-        private static void RegisterMail(string providerName, string providerUserId, string mail)
-        {
-            var username = OAuthWebSecurity.GetUserName(providerName, providerUserId);
-            RegisterMail(username, mail);
-        }
-
-        private static void RegisterMail(string username, string mail)
-        {
-            var db = new MailGamesContext();
-            db.Players.Single(p => p.UserName == username).Mail = mail; // Update mail§
+            player.FullName = player.FullName ?? fullName;
             db.SaveChanges();
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ExternalLoginConfirmation(RegisterExternalLoginModel model, string returnUrl)
-        {
-            string provider = null;
-            string providerUserId = null;
-
-            if (User.Identity.IsAuthenticated || !OAuthWebSecurity.TryDeserializeProviderUserId(model.ExternalLoginData, out provider, out providerUserId))
-            {
-                return RedirectToAction("Manage");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Insert a new user into the database
-                using (MailGamesContext db = new MailGamesContext())
-                {
-                    var user = db.Players.FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
-                    // Check if user already exists
-                    if (user == null)
-                    {
-                        // Insert name into the profile table
-                        user = db.Players.FirstOrDefault(u => u.Mail == model.Mail);
-                        if (user != null)
-                            user.UserName = model.UserName;
-                        else
-                            db.Players.Add(new Player { Guid = Guid.NewGuid(), UserName = model.UserName });
-                        db.SaveChanges();
-
-                        OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
-                        OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
-
-                        RegisterMail(provider, providerUserId, model.Mail);
-
-                        return RedirectToLocal(returnUrl);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
-                    }
-                }
-            }
-
-            ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(provider).DisplayName;
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
         }
 
         //

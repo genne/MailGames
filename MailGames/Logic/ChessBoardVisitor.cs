@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Chess;
 using GameBase;
@@ -30,6 +31,7 @@ namespace MailGames.Logic
         {
             var board = db.ChessBoards.Create();
             db.ChessBoards.Add(board);
+            board.ChessMoves = new Collection<ChessMove>();
             return board;
         }
 

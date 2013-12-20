@@ -16,8 +16,8 @@
         <legend>Registration Form</legend>
         <ol>
             <li class="form-group">
-                @Html.LabelFor(m => m.UserName)
-                @Html.TextBoxFor(m => m.UserName, new{ @class="form-control"})
+                @Html.LabelFor(m => m.Mail)
+                @Html.TextBoxFor(m => m.Mail, new{ @class="form-control", type="email"})
             </li>
             <li class="form-group">
                 @Html.LabelFor(m => m.Password)
@@ -26,10 +26,6 @@
             <li class="form-group">
                 @Html.LabelFor(m => m.ConfirmPassword)
                 @Html.PasswordFor(m => m.ConfirmPassword, new{ @class="form-control"})
-            </li>
-            <li class="form-group">
-                @Html.LabelFor(m => m.Mail)
-                @Html.TextBoxFor(m => m.Mail, new{ @class="form-control"})
             </li>
         </ol>
         <input type="submit" value="Register" class="btn btn-primary btn-lg"/>

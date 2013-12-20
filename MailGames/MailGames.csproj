@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>44302</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -282,6 +282,7 @@
     </Content>
     <Content Include="Content\less\site.less" />
     <Compile Include="ChessConversion.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Context\ChessBoard.cs" />
     <Compile Include="Context\ChessMove.cs" />
     <Compile Include="Context\JapaneseWhistBoard.cs" />
@@ -299,6 +300,7 @@
     <Compile Include="Controllers\GameControllerBase.cs" />
     <Compile Include="Controllers\OthelloConversion.cs" />
     <Compile Include="Controllers\OthelloQueries.cs" />
+    <Compile Include="Logic\Utils.cs" />
     <Compile Include="Filters\EnsureFullNameAttribute.cs" />
     <Compile Include="Logic\ChessBoardVisitor.cs" />
     <Compile Include="Logic\GameLogic.cs" />
@@ -408,8 +410,12 @@
       <DependentUpon>variables.less</DependentUpon>
     </Content>
     <Content Include="Scripts\chess.js" />
+    <Content Include="Views\Account\LoginFacebook.cshtml" />
     <TypeScriptCompile Include="Scripts\game.ts" />
     <Content Include="Scripts\game.js" />
+    <TypeScriptCompile Include="Scripts\startgame.ts" />
+    <Content Include="Scripts\startgame.js" />
+    <TypeScriptCompile Include="Scripts\typings\fb\fb.d.ts" />
     <Content Include="Views\Shared\_Game.cshtml" />
     <Content Include="Views\Home\User.cshtml" />
     <Content Include="Views\Othello\Game.cshtml" />
@@ -554,7 +560,6 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
-    <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />

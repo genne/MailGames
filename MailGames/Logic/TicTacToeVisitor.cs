@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using GameBase;
 using MailGames.Context;
@@ -33,6 +34,7 @@ namespace MailGames.Logic
             var board = db.TicTacToeBoards.Create();
             board.Variant = _variant;
             db.TicTacToeBoards.Add(board);
+            board.Moves = new Collection<TicTacToeMove>();
             return board;
         }
 

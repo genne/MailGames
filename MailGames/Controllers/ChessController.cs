@@ -82,13 +82,28 @@ namespace MailGames.Controllers
                 DateTime = DateTime.Now
             });
 
-            boardObj.Check = ChessLogic.IsCheck(currentState, currentState.CurrentPlayer);
-
             GameLogic.UpdateWinnerState(boardObj);
 
+            var opponentIsAI = boardObj.FirstPlayer == null || boardObj.SecondPlayer == null;
+            if (opponentIsAI && !boardObj.WinnerState.HasValue)
+            {
+                var aiMove = ChessAI.GetMove(currentState);
+                boardObj.ChessMoves.Add(new ChessMove
+                {
+                    From = aiMove.From,
+                    To = aiMove.To,
+                    PawnConversion = aiMove.ConvertPawnTo.HasValue ? new[] { new PawnConversion { ConvertTo = aiMove.ConvertPawnTo.Value } } : new PawnConversion[0],
+                    DateTime = DateTime.Now
+                });
+            }
+
+            boardObj.Check = ChessLogic.IsCheck(currentState, currentState.CurrentPlayer);
             db.SaveChanges();
 
-            SendOpponentMail(db, boardObj);
+            if (!opponentIsAI)
+            {
+                SendOpponentMail(db, boardObj);
+            }
 
             return RedirectToAction("Game", new {id = board});
         }

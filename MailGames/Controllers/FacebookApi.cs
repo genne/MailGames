@@ -22,16 +22,23 @@ namespace MailGames.Controllers
             return client.Get(path, parameters);
         }
 
-        public static IEnumerable<StartGameHomeViewModel.Friend> Friends()
+        public static IEnumerable<Friend> Friends()
         {
             dynamic friends = Get("me/friends", new{ fields = "picture,name"});
             if (friends == null) return null;
-            return ((IEnumerable<dynamic>)friends.data).Select(f => new StartGameHomeViewModel.Friend
+            return ((IEnumerable<dynamic>)friends.data).Select(f => new Friend
             {
                 Id = f.id,
                 Name = f.name,
                 Picture = f.picture.data.url
             });
+        }
+
+        public class Friend
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Picture { get; set; }
         }
     }
 }

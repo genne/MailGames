@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using GameBase;
 using JapaneseWhist;
@@ -35,6 +36,7 @@ namespace MailGames.Logic
         {
             var board = db.JapaneseWhistBoards.Create();
             db.JapaneseWhistBoards.Add(board);
+            board.Moves = new Collection<JapaneseWhistMove>();
             return board;
         }
 

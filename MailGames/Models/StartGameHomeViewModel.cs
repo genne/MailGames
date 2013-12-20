@@ -5,13 +5,20 @@ namespace MailGames.Models
 {
     public class StartGameHomeViewModel
     {
-        public IEnumerable<Friend> Friends { get; set; }
+        public IEnumerable<Friend> PlayedOpponents { get; set; }
 
         public class Friend
         {
-            public string Id { get; set; }
-            public string Picture { get; set; }
+            public long Id { get; set; }
             public string Name { get; set; }
+
+            public FriendType FriendType { get; set; }
+        }
+
+        public enum FriendType
+        {
+            Opponent,
+            Facebook
         }
     }
 }

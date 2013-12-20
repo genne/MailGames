@@ -71,5 +71,10 @@ namespace GameBase
         {
             return new Position(X + move.DeltaCol, Y + move.DeltaRow);
         }
+
+        public override string ToString()
+        {
+            return "(" + X + "," + Y + ")";
+        }
     }
 }

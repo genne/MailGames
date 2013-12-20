@@ -23,8 +23,8 @@ namespace MailGames
             //    consumerSecret: "");
 
             OAuthWebSecurity.RegisterFacebookClient(
-                appId: "221909777970862",
-                appSecret: "a1af42d7c6ab1528f80c1c47e1b652aa");
+                appId: Constants.FACEBOOK_APP_ID,
+                appSecret: Constants.FACEBOOK_SECRET);
 
             OAuthWebSecurity.RegisterGoogleClient();
         }

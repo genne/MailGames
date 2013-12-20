@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using GameBase;
 using MailGames.Context;
@@ -31,6 +32,7 @@ namespace MailGames.Logic
         {
             var board = db.OthelloBoards.Create();
             db.OthelloBoards.Add(board);
+            board.Moves = new Collection<OthelloMove>();
             return board;
         }
 

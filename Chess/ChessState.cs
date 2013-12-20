@@ -26,6 +26,7 @@ namespace Chess
             CurrentPlayer = state.CurrentPlayer;
             CapturedPieces = new List<Piece>(state.CapturedPieces);
             Moves = new LinkedList<PieceMove>(state.Moves);
+            _movedPositions = new List<Position>(state._movedPositions);
         }
 
         public Piece GetCell(int cell)

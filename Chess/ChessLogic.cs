@@ -65,35 +65,37 @@ namespace Chess
 
         private static IEnumerable<Move> GetKingMoves(Piece piece, Position pos, ChessState state, bool attackOnly)
         {
+            var moves = new List<Move>();
             foreach (var move in AllDirections.Where(move => GetTargetState(piece, pos, state, move) != TargetState.SelfOrOutside))
             {
-                yield return move;
+                moves.Add(move);
             }
 
             // Rockad
-            if (attackOnly) yield break;
+            if (attackOnly) return moves;
 
             var kingPos = FindPiece(state, PieceType.King, state.CurrentPlayer);
-            if (!IsCheck(state, state.CurrentPlayer) && !HasMoved(state, kingPos))
-            {
-                foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentPlayer))
-                {
-                    if (HasMoved(state, rookPos)) continue;
+            if (IsCheck(state, state.CurrentPlayer) || HasMoved(state, kingPos)) return moves;
 
-                    var cellsBetween = GetCellsBetween(kingPos, rookPos, false);
-                    var rookDir = rookPos.X > kingPos.X ? 1 : -1;
-                    var kingMovement = new Move {DeltaCol = 2*rookDir};
-                    var kingTargetPos = kingPos.Move(kingMovement);
-                    var kingMovementCells = GetCellsBetween(kingPos, kingTargetPos, true);
-                    var isCellsBetweenAlreadyOccupied = cellsBetween.Any(c => state.GetCell(c) != null);
-                    var isKingMovementCellsAttacked =
-                        kingMovementCells.Any(
-                            kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentPlayer));
-                    if (!isCellsBetweenAlreadyOccupied
-                        && !isKingMovementCellsAttacked)
-                        yield return kingMovement;
-                }
+            foreach (var rookPos in FindPieces(state, PieceType.Rook, state.CurrentPlayer))
+            {
+                if (HasMoved(state, rookPos)) continue;
+
+                var cellsBetween = GetCellsBetween(kingPos, rookPos, false);
+                var rookDir = rookPos.X > kingPos.X ? 1 : -1;
+                var kingMovement = new Move {DeltaCol = 2*rookDir};
+                var kingTargetPos = kingPos.Move(kingMovement);
+                var kingMovementCells = GetCellsBetween(kingPos, kingTargetPos, true).ToArray();
+                var isCellsBetweenAlreadyOccupied = cellsBetween.Any(c => state.GetCell(c) != null);
+                var isKingMovementCellsAttacked =
+                    kingMovementCells.Any(
+                        kingMovementCell => IsAttacked(state, kingMovementCell, state.CurrentPlayer));
+                if (!isCellsBetweenAlreadyOccupied
+                    && !isKingMovementCellsAttacked)
+                    moves.Add(kingMovement);
             }
+
+            return moves;
         }
 
         private static IEnumerable<Move> GetQueenMoves(Piece piece, Position pos, ChessState state)
@@ -143,7 +145,10 @@ namespace Chess
         {
             var pawnStartRow = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : 6;
             var pawnDir = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : -1;
-            if (!attackOnly && pos.Y == pawnStartRow) yield return new Move {DeltaRow = 2*pawnDir};
+            if (!attackOnly && pos.Y == pawnStartRow 
+                && state.GetCell(pos.Add(new Position(0, pawnDir))) == null
+                && state.GetCell(pos.Add(new Position(0, pawnDir*2))) == null
+                ) yield return new Move {DeltaRow = 2*pawnDir};
 
             foreach (var directionalMove in new[] {-1, 1}.Select(d => new Move {DeltaRow = pawnDir, DeltaCol = d}))
             {
@@ -383,7 +388,7 @@ namespace Chess
             return Math.Max(0, Math.Min(MaxProgress, (MaxProgress / 2) + (points1 - points2) * (MaxProgress / 2) / GetPieceTypePoints(PieceType.Queen)));
         }
 
-        private static int GetPoints(ChessState state, GamePlayer gamePlayer)
+        public static int GetPoints(ChessState state, GamePlayer gamePlayer)
         {
             return FindPieces(state, gamePlayer).Sum(p => GetPieceTypePoints(p.Value.PieceType));
         }

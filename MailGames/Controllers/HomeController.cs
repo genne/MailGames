@@ -25,7 +25,7 @@ namespace MailGames.Controllers
         {
             var db = new MailGamesContext();
             var allBoards = GameLogic.GetAllBoards(db);
-            var games = allBoards.Where(b => b.FirstPlayer.Id == WebSecurity.CurrentUserId || b.SecondPlayer.Id == WebSecurity.CurrentUserId).Select(b => new
+            var games = FilterPlayerBoards(allBoards).Select(b => new
             {
                 Board = b
             }).Select(b => new
@@ -52,6 +52,11 @@ namespace MailGames.Controllers
             });
         }
 
+        private static IEnumerable<IGameBoard> FilterPlayerBoards(IEnumerable<IGameBoard> allBoards)
+        {
+            return allBoards.Where(b => b.FirstPlayer.Id == WebSecurity.CurrentUserId || b.SecondPlayer.Id == WebSecurity.CurrentUserId);
+        }
+
         public void UpdateRankings()
         {
             var db = new MailGamesContext();
@@ -76,22 +81,89 @@ namespace MailGames.Controllers
         public ActionResult StartGame()
         {
             var model = new StartGameHomeViewModel();
-            model.Friends = FacebookApi.Friends();
+            model.PlayedOpponents =
+                FilterPlayerBoards(GameLogic.GetAllBoards(new MailGamesContext()))
+                    .SelectMany(b => new[] {b.FirstPlayer, b.SecondPlayer})
+                    .Where(p => p.FullName != null && p.Id != WebSecurity.CurrentUserId)
+                    .Distinct().Select(p => new StartGameHomeViewModel.Friend
+                    {
+                        Id = p.Id,
+                        Name = p.FullName,
+                        FriendType = StartGameHomeViewModel.FriendType.Opponent
+                    }).ToArray();
+            var facebookFriends = FacebookApi.Friends();
+            if (facebookFriends != null)
+            {
+                model.PlayedOpponents =
+                    model.PlayedOpponents.Concat(facebookFriends.Select(f => new StartGameHomeViewModel.Friend
+                    {
+                        Id = long.Parse(f.Id),
+                        Name = f.Name,
+                        FriendType = StartGameHomeViewModel.FriendType.Facebook
+                    }));
+            }
             return View(model);
         }
 
         [Authorize]
         [HttpPost]
-        public ActionResult StartGame(string opponentsmail, GameType gameType)
+        public ActionResult StartGame(string opponentsmail, string playedOpponent, GameType gameType)
         {
+            StartGameHomeViewModel.FriendType friendType;
+            long friendId;
+            Player opponent;
             var db = new MailGamesContext();
+            string name;
+            if (ParseFriendId(playedOpponent, out friendType, out friendId, out name))
+            {
+                if (friendType == StartGameHomeViewModel.FriendType.Facebook)
+                {
+                    opponent = PlayerManager.FindOrCreateFBPlayer(db, friendId);
+                    opponent.FullName = name;
+                }
+                else
+                {
+                    opponent = db.Players.Find(friendId);
+                }
+            }
+            else
+            {
+                opponent = PlayerManager.FindOrCreatePlayer(db, opponentsmail);
+            }
+
             var board = GameLogic.CreateGameBoard(gameType, db);
             board.Id = Guid.NewGuid();
-            string yourmail = PlayerManager.GetCurrent(db).Mail;
-            board.FirstPlayer = PlayerManager.FindOrCreatePlayer(yourmail, db);
-            board.SecondPlayer = PlayerManager.FindOrCreatePlayer(opponentsmail, db);
+            board.FirstPlayer = PlayerManager.GetCurrent(db);
+            board.SecondPlayer = opponent;
+            if (new Random().Next(2) == 1)
+            {
+                var firstPlayer = board.FirstPlayer;
+                var secondPlayer = board.SecondPlayer;
+                Utils.Swap(ref firstPlayer, ref secondPlayer);
+                board.FirstPlayer = firstPlayer;
+                board.SecondPlayer = secondPlayer;
+
+                SendOpponentMail(db, board);
+            }
             db.SaveChanges();
             return RedirectToAction("Game", GameLogic.GetController(board), new { id = board.Id });
+        }
+
+        private bool ParseFriendId(string playedOpponent, out StartGameHomeViewModel.FriendType friendType, out long friendId, out string name)
+        {
+            var split = playedOpponent.Split('_');
+            if (split.Length != 2)
+            {
+                friendType = StartGameHomeViewModel.FriendType.Opponent;
+                friendId = 0;
+                name = null;
+                return false;
+            }
+            friendId = long.Parse(split[0]);
+            var split2 = split[1].Split('|');
+            friendType = (StartGameHomeViewModel.FriendType)Enum.Parse(typeof(StartGameHomeViewModel.FriendType), split2[0]);
+            name = split2[1];
+            return true;
         }
 
         public ActionResult Rematch(Guid id, GameType gameType)

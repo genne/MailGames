@@ -13,7 +13,7 @@ namespace MailGames.Logic
 {
     public class GameLogic
     {
-        private static readonly TimeSpan PassivityDuration = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan PassivityDuration = TimeSpan.FromDays(1);
 
         public static void UpdateWinnerState(IGameBoard board)
         {
