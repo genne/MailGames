@@ -11,7 +11,15 @@
 <h1>
     @GameLogic.GetName(Model.GameType) 
     <small>
-        against <a href="@Url.Action("User", "Home", new{ Id = Model.OpponentId })">@Model.OpponentName</a>
+        against 
+        @if (Model.OpponentId.HasValue)
+        {
+            <a href="@Url.Action("User", "Home", new {Id = Model.OpponentId})">@Model.OpponentName</a>
+        }
+        else
+        {
+            @Model.OpponentName
+        }
         <a href="http://en.wikipedia.org/wiki/@GameLogic.GetWikipediaId(Model.GameType)" target="help"><b class="glyphicon glyphicon-question-sign"></b></a>
     </small>
 </h1>

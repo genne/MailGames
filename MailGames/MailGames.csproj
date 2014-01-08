@@ -64,6 +64,9 @@
       <HintPath>..\packages\Facebook.6.4.2\lib\net45\Facebook.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MiniProfiler">
+      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -336,6 +339,14 @@
     <Compile Include="Migrations\201312111231259_RankingMigration.cs" />
     <Compile Include="Migrations\201312111231259_RankingMigration.Designer.cs">
       <DependentUpon>201312111231259_RankingMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201312201344263_DontRequireChessPlayers.cs" />
+    <Compile Include="Migrations\201312201344263_DontRequireChessPlayers.Designer.cs">
+      <DependentUpon>201312201344263_DontRequireChessPlayers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201401041214530_WaitingGames.cs" />
+    <Compile Include="Migrations\201401041214530_WaitingGames.Designer.cs">
+      <DependentUpon>201401041214530_WaitingGames.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -638,6 +649,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201312111231259_RankingMigration.resx">
       <DependentUpon>201312111231259_RankingMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201312201344263_DontRequireChessPlayers.resx">
+      <DependentUpon>201312201344263_DontRequireChessPlayers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201401041214530_WaitingGames.resx">
+      <DependentUpon>201401041214530_WaitingGames.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

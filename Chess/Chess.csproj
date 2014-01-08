@@ -42,7 +42,10 @@
     <Compile Include="ChessAI.cs" />
     <Compile Include="ChessLogic.cs" />
     <Compile Include="ChessMove.cs" />
+    <Compile Include="ChessPointsSettings.cs" />
     <Compile Include="ChessState.cs" />
+    <Compile Include="Piece.cs" />
+    <Compile Include="PieceType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -35,33 +35,6 @@ namespace MailGames.Logic
             return currentPlayer;
         }
 
-        private static GamePlayer? GetWinner(WinnerState winnerState)
-        {
-            switch (winnerState)
-            {
-                case WinnerState.FirstPlayer:
-                    return GamePlayer.FirstPlayer;
-                case WinnerState.SecondPlayer:
-                    return GamePlayer.SecondPlayer;
-                case WinnerState.Tie:
-                    return null;
-                case WinnerState.FirstPlayerResigned:
-                    return GamePlayer.SecondPlayer;
-                    break;
-                case WinnerState.SecondPlayerResigned:
-                    return GamePlayer.FirstPlayer;
-                    break;
-                case WinnerState.FirstPlayerPassive:
-                    return GamePlayer.SecondPlayer;
-                    break;
-                case WinnerState.SecondPlayerPassive:
-                    return GamePlayer.FirstPlayer;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("winnerState");
-            }
-        }
-
         public static GameState GetGameState(IGameBoard board)
         {
             var winnerState = board.WinnerState;
@@ -69,7 +42,7 @@ namespace MailGames.Logic
             var currentPlayer = GetCurrentPlayer(board);
             if (winnerState.HasValue)
             {
-                var winner = GetWinner(winnerState.Value);
+                var winner = GameBaseLogic.GetWinner(winnerState.Value);
                 if (winner == null) return GameState.Tie;
                 return winner == loggedInPlayer ? GameState.PlayerWon : GameState.OpponentWon;
             }
@@ -78,7 +51,7 @@ namespace MailGames.Logic
 
         public static GamePlayer GetLoggedInPlayer(IGameBoard boardObj)
         {
-            return boardObj.FirstPlayer.Id == WebSecurity.CurrentUserId ? GamePlayer.FirstPlayer : GamePlayer.SecondPlayer;
+            return boardObj.FirstPlayer != null && boardObj.FirstPlayer.Id == WebSecurity.CurrentUserId ? GamePlayer.FirstPlayer : GamePlayer.SecondPlayer;
         }
 
         public static IGameBoard CreateGameBoard(GameType gameType, MailGamesContext db)
@@ -207,8 +180,8 @@ namespace MailGames.Logic
 
         public static void UpdateRankings(IGameBoard boardObj)
         {
-            if (boardObj.WinnerState == null) return;
-            var winner = GetWinner(boardObj.WinnerState.Value);
+            if (boardObj.WinnerState == null || HasAIPlayer(boardObj)) return;
+            var winner = GameBaseLogic.GetWinner(boardObj.WinnerState.Value);
             var gameType = GetGameType(boardObj);
             var player1Ranking = GetRankingObject(boardObj.FirstPlayer, gameType);
             var player2Ranking = GetRankingObject(boardObj.SecondPlayer, gameType);
@@ -228,6 +201,11 @@ namespace MailGames.Logic
             }
         }
 
+        public static bool HasAIPlayer(IGameBoard boardObj)
+        {
+            return boardObj.FirstPlayer == null || boardObj.SecondPlayer == null;
+        }
+
         private static PlayerGameRanking GetRankingObject(Player firstPlayer, GameType gameType)
         {
             var rankingObject = firstPlayer.Rankings.FirstOrDefault(r => r.GameType == gameType);
@@ -245,6 +223,11 @@ namespace MailGames.Logic
         public static void RemoveBoard(MailGamesContext db, IGameBoard board)
         {
             GetVisitor(board).Remove(db);
+        }
+
+        public static void MoveAI(IGameBoard board)
+        {
+            GetVisitor(board).MoveAI();
         }
     }
 }

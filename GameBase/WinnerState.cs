@@ -1,5 +1,12 @@
-namespace MailGames.Context
+namespace GameBase
 {
+    public enum GameWinnerState
+    {
+        FirstPlayer,
+        SecondPlayer,
+        Tie,
+    }
+
     public enum WinnerState
     {
         FirstPlayer,

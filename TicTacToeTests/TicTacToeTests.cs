@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using GameBase;
-using MailGames.Context;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MiniProfiler.Windows;
+using StackExchange.Profiling;
 using TicTacToe;
 
 namespace TicTacToeTests
@@ -16,9 +17,9 @@ namespace TicTacToeTests
             var state = new TicTacToeState(TicTacToeVariant.Original);
             SetState(state, new[]
             {
+                "XXO",
                 "OXX",
-                "OXO",
-                "XOX"
+                "XOO"
             });
             Assert.AreEqual(WinnerState.Tie, TicTacToeLogic.GetWinner(state));
         }
@@ -33,7 +34,7 @@ namespace TicTacToeTests
                 int y = random.Next(state.Height);
                 if (state.Get(new Position(x, y)) == null)
                 {
-                    var color = matrix[y][x] == 'X' ? TicTacToeColor.X : TicTacToeColor.O;
+                    var color = matrix[y][x] == 'X' ? GamePlayer.FirstPlayer : GamePlayer.SecondPlayer;
                     if (state.CurrentPlayer == color)
                     {
                         state.Play(x, y);
@@ -79,6 +80,23 @@ namespace TicTacToeTests
             state.Play(2, 2);
             var winner = TicTacToeLogic.GetWinner(state);
             Assert.AreEqual(WinnerState.FirstPlayer, winner);
+        }
+
+        [TestMethod]
+        public void TestSimpleAI()
+        {
+            var ai = new TicTacToeAI(0);
+            var state = new TicTacToeState(TicTacToeVariant.Lufferschess);
+            state.Play(8, 8);
+            state.Play(0, 0);
+            state.Play(8, 9);
+            state.Play(8, 7);
+            state.Play(8, 10);
+            state.Play(1, 1);
+            state.Play(8, 11);
+            var move = ai.GetRandomBestMove(state);
+            Assert.AreEqual(8, move.X);
+            Assert.AreEqual(12, move.Y);
         }
     }
 }

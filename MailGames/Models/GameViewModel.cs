@@ -21,7 +21,7 @@ namespace MailGames.Models
 
         public Activity OpponentActivity { get; private set; }
 
-        public int OpponentId { get; private set; }
+        public int? OpponentId { get; private set; }
 
         public GameViewModel(IGameBoard board)
         {

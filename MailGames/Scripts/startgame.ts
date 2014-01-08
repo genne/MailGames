@@ -3,28 +3,36 @@
 var friendSelector = $("[name='playedOpponent']");
 friendSelector.change(function (ev) {
     if (friendSelector.val() == "") {
-        $("#opponentsmail-group").slideDown(null, function () {
+        $("#opponentsmail-group").stop().slideDown(null, function () {
             $("#opponentsmail-group input").focus();
         });
     }
     else {
-        $("#opponentsmail-group").slideUp();
+        $("#opponentsmail-group").stop().slideUp();
     }
-});
+}).change();
 
 function getSelectedOption(selector : JQuery) : JQuery {
     return selector.find("option[value='" + selector.val() + "']");
 }
 
+var gameTypeSelector = $("select[name='gameType']");
+gameTypeSelector.change(function (ev) {
+    var computerOpponent = $("#computer-opponent");
+    computerOpponent.toggle(gameTypeSelector.val() == "Chess" || gameTypeSelector.val() == "CrissCross" || gameTypeSelector.val() == "TicTacToe" || gameTypeSelector.val() == "Othello");
+    if (computerOpponent.is(":selected")) {
+        computerOpponent.closest("select").val("").change();
+    }
+}).change();
+
 function getSelectedGameName() {
-    var gameTypeSelector = $("select[name='gameType']");
     return getSelectedOption(gameTypeSelector).text();
 }
 
 function getSelectedPlayerFBUserId() : number {
     var playerSelector = $("select[name='playedOpponent']");
     var id = getSelectedOption(playerSelector).attr("data-fb-id");
-    if (id != "") return parseInt(id);
+    if (id != "" && id != null) return parseInt(id);
     return null;
 }
 
@@ -46,14 +54,3 @@ submitButton.click(function (ev) {
         });
     }
 });
-
-//window.setTimeout(function () {
-
-//    FB.ui({
-//        method: 'apprequests',
-//        message: 'Test',
-//        to: [692791562]
-//    }, function (args) {
-//            console.log("Good!", args);
-//        });
-//}, 3000);

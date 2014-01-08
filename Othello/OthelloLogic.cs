@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameBase;
-using MailGames.Context;
 
 namespace Othello
 {

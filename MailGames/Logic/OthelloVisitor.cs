@@ -65,5 +65,15 @@ namespace MailGames.Logic
         {
             db.OthelloBoards.Remove(_othelloBoard);
         }
+
+        public void MoveAI()
+        {
+            var move = new OthelloAI(2).GetRandomBestMove(OthelloConversion.GetCurrentState(_othelloBoard));
+            _othelloBoard.Moves.Add(new OthelloMove
+            {
+                DateTime =  DateTime.Now,
+                Position = move.ToInt()
+            });
+        }
     }
 }

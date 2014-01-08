@@ -56,9 +56,9 @@ namespace MailGames.Controllers
 
             GameLogic.UpdateWinnerState(boardObj);
 
-            db.SaveChanges();
-
             SendOpponentMail(db, boardObj);
+
+            db.SaveChanges();
 
             return RedirectToAction("Game", new {id = board});
         }

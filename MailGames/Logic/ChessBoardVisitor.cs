@@ -65,5 +65,20 @@ namespace MailGames.Logic
         {
             db.ChessBoards.Remove(_chessBoard);
         }
+
+        public void MoveAI()
+        {
+            var aiMove = new ChessAI().GetRandomBestMove(ChessConversion.GetCurrentState(_chessBoard));
+            _chessBoard.ChessMoves.Add(new ChessMove
+            {
+                From = aiMove.From,
+                To = aiMove.To,
+                PawnConversion =
+                    aiMove.ConvertPawnTo.HasValue
+                        ? new[] { new PawnConversion { ConvertTo = aiMove.ConvertPawnTo.Value } }
+                        : new PawnConversion[0],
+                DateTime = DateTime.Now
+            });
+        }
     }
 }

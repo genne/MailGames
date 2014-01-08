@@ -36,5 +36,29 @@ namespace ChessTests
             Assert.AreEqual(100, ChessLogic.GetProgress(state, GamePlayer.FirstPlayer));
             Assert.AreEqual(0, ChessLogic.GetProgress(state, GamePlayer.SecondPlayer));
         }
+
+        [TestMethod]
+        public void TestParsePosition()
+        {
+            var pos = new Position(2, 4);
+            Assert.AreEqual(pos, ChessLogic.ParseChessPosition(ChessLogic.FormatChessPosition(pos)));
+        }
+
+        [TestMethod]
+        public void TestEnPassant()
+        {
+            var state = new ChessState();
+            AddKings(state);
+            state.SetCell("a2", GamePlayer.FirstPlayer, PieceType.Pawn);
+            state.SetCell("b4", GamePlayer.SecondPlayer, PieceType.Pawn);
+            ChessLogic.ApplyMove(state, "a2", "a4", null);
+            ChessLogic.ValidateMove(state, "b4", "a3", null, validateTarget: true);
+        }
+
+        private void AddKings(ChessState state)
+        {
+            state.SetCell("e1", GamePlayer.FirstPlayer, PieceType.King);
+            state.SetCell("e8", GamePlayer.SecondPlayer, PieceType.King);
+        }
     }
 }

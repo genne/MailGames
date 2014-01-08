@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using GameBase;
-using MailGames.Context;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Othello;
 

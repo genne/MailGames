@@ -28,7 +28,7 @@ namespace MailGames.Controllers
             var model = new ChessBoardViewModel();
             model.Id = board.Id;
             model.CurrentColor = state.CurrentPlayer;
-            model.PlayerColor = board.FirstPlayer.Id == WebSecurity.CurrentUserId ? GamePlayer.FirstPlayer : GamePlayer.SecondPlayer;
+            model.PlayerColor = GameLogic.GetLoggedInPlayer(board);
             bool check = ChessLogic.IsCheck(state, state.CurrentPlayer);
             model.AttackedKing = check
                                      ? state.CurrentPlayer
@@ -84,26 +84,11 @@ namespace MailGames.Controllers
 
             GameLogic.UpdateWinnerState(boardObj);
 
-            var opponentIsAI = boardObj.FirstPlayer == null || boardObj.SecondPlayer == null;
-            if (opponentIsAI && !boardObj.WinnerState.HasValue)
-            {
-                var aiMove = ChessAI.GetMove(currentState);
-                boardObj.ChessMoves.Add(new ChessMove
-                {
-                    From = aiMove.From,
-                    To = aiMove.To,
-                    PawnConversion = aiMove.ConvertPawnTo.HasValue ? new[] { new PawnConversion { ConvertTo = aiMove.ConvertPawnTo.Value } } : new PawnConversion[0],
-                    DateTime = DateTime.Now
-                });
-            }
+            SendOpponentMail(db, boardObj);
 
             boardObj.Check = ChessLogic.IsCheck(currentState, currentState.CurrentPlayer);
-            db.SaveChanges();
 
-            if (!opponentIsAI)
-            {
-                SendOpponentMail(db, boardObj);
-            }
+            db.SaveChanges();
 
             return RedirectToAction("Game", new {id = board});
         }

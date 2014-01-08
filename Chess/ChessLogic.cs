@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using GameBase;
-using MailGames.Context;
 
 namespace Chess
 {
     public static class ChessLogic
     {
+        private static readonly ChessPointsSettings ChessPointsSettings = new ChessPointsSettings();
         private const int MaxProgress = 100;
 
         public static IEnumerable<int> GetAvailableTargets(ChessState state, int sourceCell)
@@ -143,8 +144,9 @@ namespace Chess
 
         private static IEnumerable<Move> GetPawnMoves(Piece piece, Position pos, ChessState state, bool attackOnly)
         {
-            var pawnStartRow = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : 6;
-            var pawnDir = piece.GamePlayer == GamePlayer.SecondPlayer ? 1 : -1;
+            var gamePlayer = piece.GamePlayer;
+            var pawnStartRow = gamePlayer == GamePlayer.SecondPlayer ? 1 : 6;
+            var pawnDir = GetPawnDir(gamePlayer);
             if (!attackOnly && pos.Y == pawnStartRow 
                 && state.GetCell(pos.Add(new Position(0, pawnDir))) == null
                 && state.GetCell(pos.Add(new Position(0, pawnDir*2))) == null
@@ -152,11 +154,14 @@ namespace Chess
 
             foreach (var directionalMove in new[] {-1, 1}.Select(d => new Move {DeltaRow = pawnDir, DeltaCol = d}))
             {
-                var position = pos.Move(directionalMove);
-                if (IsOutside(position)) continue;
-                var directionalMoveTarget = position.ToInt();
-                if (state.GetCell(directionalMoveTarget) != null &&
-                    state.GetCell(directionalMoveTarget).GamePlayer != piece.GamePlayer)
+                var targetPos = pos.Move(directionalMove);
+                if (IsOutside(targetPos)) continue;
+                var directionalMoveTarget = targetPos.ToInt();
+                var targetPiece = state.GetCell(directionalMoveTarget);
+                if (targetPiece != null &&
+                    targetPiece.GamePlayer != gamePlayer)
+                    yield return directionalMove;
+                else if (IsEnPassant(state, targetPos))
                     yield return directionalMove;
             }
 
@@ -164,6 +169,21 @@ namespace Chess
 
             var forwardMove = new Move {DeltaRow = 1*pawnDir};
             if (state.GetCell(pos.Move(forwardMove)) == null) yield return forwardMove;
+        }
+
+        private static int GetPawnDir(GamePlayer gamePlayer)
+        {
+            return gamePlayer == GamePlayer.SecondPlayer ? 1 : -1;
+        }
+
+        private static bool IsEnPassant(ChessState state, Position targetPos)
+        {
+            var lastMove = state.Moves.LastOrDefault();
+            if (lastMove == null) return false;
+            var yDir = GetPawnDir(lastMove.Piece.GamePlayer);
+            return lastMove.Piece.PieceType == PieceType.Pawn
+                   && lastMove.From.Equals(new Position(targetPos.X, targetPos.Y - yDir))
+                   && lastMove.To.Equals(new Position(targetPos.X, targetPos.Y + yDir));
         }
 
         private static IEnumerable<Move> AllDirections
@@ -281,19 +301,26 @@ namespace Chess
             AddReflected(board, 0, 0, PieceType.Rook);
             AddReflected(board, 1, 0, PieceType.Knight);
             AddReflected(board, 2, 0, PieceType.Bishop);
-            SetCell(board, 3, 0, new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.Queen });
-            SetCell(board, 4, 0, new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.King });
-            SetCell(board, 3, 7, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Queen });
-            SetCell(board, 4, 7, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.King });
+            SetCell(board, 3, GetPlayerRow(0, GamePlayer.SecondPlayer), new Piece(GamePlayer.SecondPlayer, PieceType.Queen));
+            SetCell(board, 4, GetPlayerRow(0, GamePlayer.SecondPlayer), new Piece(GamePlayer.SecondPlayer, PieceType.King ));
+            SetCell(board, 3, GetPlayerRow(0, GamePlayer.FirstPlayer), new Piece(GamePlayer.FirstPlayer,  PieceType.Queen));
+            SetCell(board, 4, GetPlayerRow(0, GamePlayer.FirstPlayer), new Piece(GamePlayer.FirstPlayer, PieceType.King));
             return board;
         }
 
         private static void AddReflected(ChessState state, int col, int row, PieceType pieceType)
         {
-            SetCell(state, col, row, new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = pieceType });
-            SetCell(state, col, 7 - row, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = pieceType });
-            SetCell(state, 7 - col, row,  new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = pieceType });
-            SetCell(state, 7 - col, 7 - row, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = pieceType });
+            foreach (var player in GameBaseLogic.GetAllPlayers())
+            {
+                SetCell(state, col, GetPlayerRow(row, player),
+                        new Piece(player, pieceType));
+                SetCell(state, 7 - col, GetPlayerRow(row, player), new Piece(player, pieceType));
+            }
+        }
+
+        private static int GetPlayerRow(int row, GamePlayer player)
+        {
+            return player == GamePlayer.SecondPlayer ? row : 7 - row;
         }
 
         private static void SetCell(ChessState state, int col, int row, Piece piece)
@@ -323,13 +350,13 @@ namespace Chess
             }
         }
 
-        public static void ValidateMove(ChessState state, int @from, int to, PieceType? convertPawnTo)
+        public static void ValidateMove(ChessState state, int @from, int to, PieceType? convertPawnTo, bool validateTarget = false)
         {
             var fromCell = state.GetCell(@from);
             if (fromCell.GamePlayer != state.CurrentPlayer) throw new ArgumentException("Invalid move", "from");
             var pawnConversionRow = fromCell.GamePlayer == GamePlayer.FirstPlayer ? 1 : 6;
             if ((fromCell.PieceType == PieceType.Pawn && Position.FromInt(from).Y == pawnConversionRow) != convertPawnTo.HasValue) throw new ArgumentException("Invalid pawn conversion", "convertPawnTo");
-            //if (!new ChessLogic().GetAvailableTargets(state, from).Contains(to)) throw new ArgumentException("Invalid move", "to");
+            if (validateTarget && !GetAvailableTargets(state, from).Contains(to)) throw new ArgumentException("Invalid move", "to");
         }
 
         private static void ApplyMoveWithoutColorSwap(ChessState state, int @from, int to, PieceType? pawnConversion)
@@ -337,9 +364,10 @@ namespace Chess
             var piece = state.GetCell(@from);
             if (pawnConversion.HasValue)
             {
-                piece.PieceType = pawnConversion.Value;
+                piece = new Piece(piece.GamePlayer, pawnConversion.Value);
             }
             var capturedPiece = state.GetCell(to);
+            if (capturedPiece != null && capturedPiece.PieceType == PieceType.King) throw new InvalidOperationException("Can't capture king, game should end. From=" + from + " to=" + to + " FromType=" + piece.PieceType + " CurrentPlayer=" + state.CurrentPlayer);
             state.SetCell(to, piece);
             state.SetCell(@from, null);
             state.AddMove(piece, from, to, capturedPiece);
@@ -381,16 +409,38 @@ namespace Chess
 
         public static float GetProgress(ChessState state, GamePlayer player)
         {
-            var points1 = GetPoints(state, player);
-            var points2 = GetPoints(state, GameBaseLogic.GetNextPlayer(player));
+            var points1 = GetPoints(state, player, ChessPointsSettings);
+            var points2 = GetPoints(state, GameBaseLogic.GetNextPlayer(player), ChessPointsSettings);
             if (points1 == 0) return 0;
             if (points2 == 0) return MaxProgress;
             return Math.Max(0, Math.Min(MaxProgress, (MaxProgress / 2) + (points1 - points2) * (MaxProgress / 2) / GetPieceTypePoints(PieceType.Queen)));
         }
 
-        public static int GetPoints(ChessState state, GamePlayer gamePlayer)
+        public static float GetPoints(ChessState state, GamePlayer gamePlayer, ChessPointsSettings pointsSettings)
         {
-            return FindPieces(state, gamePlayer).Sum(p => GetPieceTypePoints(p.Value.PieceType));
+            return FindPieces(state, gamePlayer).Sum(p => GetPiecePoints(p.Key, p.Value, pointsSettings));
+        }
+
+        private static float GetPiecePoints(int position, Piece piece, ChessPointsSettings pointsSettings)
+        {
+            float points = GetPieceTypePoints(piece.PieceType);
+            if (piece.PieceType == PieceType.Pawn)
+            {
+                points += pointsSettings.PawnProgressionPoints*GetPawnProgression(position, piece.GamePlayer);
+            }
+            return points;
+        }
+
+        private static int GetPawnProgression(int position, GamePlayer gamePlayer)
+        {
+            var row = Position.FromInt(position).Y;
+            var startRow = GetPawnStartRow(gamePlayer);
+            return Math.Abs(row - startRow);
+        }
+
+        private static int GetPawnStartRow(GamePlayer gamePlayer)
+        {
+            return GetPlayerRow(1, gamePlayer);
         }
 
         private static int GetPieceTypePoints(PieceType pieceType)
@@ -412,6 +462,50 @@ namespace Chess
                 default:
                     throw new ArgumentOutOfRangeException("pieceType");
             }
+        }
+
+        public static string FormatChessPosition(Position position)
+        {
+            return FormatColPosition(position.X) + FormatRowPosition(position.Y);
+        }
+
+        public static string FormatRowPosition(int y)
+        {
+            return (8 - y).ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string FormatColPosition(int x)
+        {
+            return ((char)('A' + x)).ToString(CultureInfo.InvariantCulture);
+        }
+
+
+        public static Position ParseChessPosition(string cell)
+        {
+            cell = cell.ToUpper();
+            var col = cell[0];
+            var row = cell[1];
+            return new Position(ParseColPosition(col), ParseRowPosition(row));
+        }
+
+        private static int ParseRowPosition(char row)
+        {
+            return 8 - int.Parse(row.ToString(CultureInfo.InvariantCulture));
+        }
+
+        private static int ParseColPosition(char col)
+        {
+            return col - 'A';
+        }
+
+        public static void ApplyMove(ChessState state, string @from, string to, PieceType? pawnConversion)
+        {
+            ApplyMove(state, ParseChessPosition(from).ToInt(), ParseChessPosition(to).ToInt(), pawnConversion);
+        }
+
+        public static void ValidateMove(ChessState state, string @from, string to, PieceType? convertPawnTo, bool validateTarget)
+        {
+            ValidateMove(state, ParseChessPosition(from).ToInt(), ParseChessPosition(to).ToInt(), convertPawnTo, validateTarget);
         }
     }
 }

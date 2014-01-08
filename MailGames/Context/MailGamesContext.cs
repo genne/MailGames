@@ -16,8 +16,8 @@ namespace MailGames.Context
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ChessBoard>().HasRequired(b => b.FirstPlayer).WithMany().WillCascadeOnDelete(false);
-            modelBuilder.Entity<ChessBoard>().HasRequired(b => b.SecondPlayer).WithMany().WillCascadeOnDelete(false);
+            //modelBuilder.Entity<ChessBoard>().HasRequired(b => b.FirstPlayer).WithMany().WillCascadeOnDelete(false);
+            //modelBuilder.Entity<ChessBoard>().HasRequired(b => b.SecondPlayer).WithMany().WillCascadeOnDelete(false);
             base.OnModelCreating(modelBuilder);
         }
     }

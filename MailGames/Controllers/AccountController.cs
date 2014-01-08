@@ -18,6 +18,7 @@ namespace MailGames.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
+        private const bool DefaultCreatePersistentCookie = true;
         //
         // GET: /Account/Login
 
@@ -111,7 +112,7 @@ namespace MailGames.Controllers
                 {
                     PlayerManager.CreatePlayer(model.Mail);
                     WebSecurity.CreateAccount(model.Mail, model.Password);
-                    WebSecurity.Login(model.Mail, model.Password);
+                    WebSecurity.Login(model.Mail, model.Password, persistCookie: DefaultCreatePersistentCookie);
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -269,7 +270,7 @@ namespace MailGames.Controllers
             var db = new MailGamesContext();
             Player player;
 
-            if (OAuthWebSecurity.Login(providerName, providerUserId, createPersistentCookie: false))
+            if (OAuthWebSecurity.Login(providerName, providerUserId, DefaultCreatePersistentCookie))
             {
                 var userName = OAuthWebSecurity.GetUserName(providerName, providerUserId);
                 player = db.Players.First(p => p.UserName == userName);
@@ -281,7 +282,7 @@ namespace MailGames.Controllers
                 player = PlayerManager.FindOrCreatePlayer(db, mail);
                 db.SaveChanges();
                 OAuthWebSecurity.CreateOrUpdateAccount(providerName, providerUserId, mail);
-                OAuthWebSecurity.Login(providerName, providerUserId, false);    
+                OAuthWebSecurity.Login(providerName, providerUserId, DefaultCreatePersistentCookie);    
             }
 
             player.FullName = player.FullName ?? fullName;
@@ -414,7 +415,7 @@ namespace MailGames.Controllers
                 userName = playerDb.UserName;
                 db.SaveChanges();
             }
-            FormsAuthentication.SetAuthCookie(userName, false);
+            FormsAuthentication.SetAuthCookie(userName, DefaultCreatePersistentCookie);
             Session.Abandon();
             return RedirectToLocal(redirectto);
         }

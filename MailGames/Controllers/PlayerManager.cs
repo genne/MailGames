@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using MailGames.Context;
+using MailGames.Logic;
 using Microsoft.Web.WebPages.OAuth;
 using WebMatrix.WebData;
 
@@ -12,6 +14,11 @@ namespace MailGames.Controllers
         public static Player GetCurrent(MailGamesContext db)
         {
             return db.Players.Single(p => p.UserName == HttpContext.Current.User.Identity.Name);
+        }
+
+        public static IEnumerable<IGameBoard> FilterPlayerBoards(IEnumerable<IGameBoard> allBoards)
+        {
+            return allBoards.Where(b => (b.FirstPlayer != null && b.FirstPlayer.Id == WebSecurity.CurrentUserId) || (b.SecondPlayer != null && b.SecondPlayer.Id == WebSecurity.CurrentUserId));
         }
 
         public static Player FindOrCreatePlayer(MailGamesContext db, string mail)
@@ -39,25 +46,27 @@ namespace MailGames.Controllers
 
         public static string GetOpponentName(IGameBoard board)
         {
-            var opponentPlayer = GetOpponentPlayer(board);
+            var opponentPlayer = GetOpponent(board);
             return GetPlayerName(opponentPlayer);
         }
 
-        private static Player GetOpponentPlayer(IGameBoard board)
+        public static Player GetOpponent(IGameBoard board)
         {
-            var opponentPlayer = board.FirstPlayer.Id == WebSecurity.CurrentUserId
+            var opponentPlayer = board.FirstPlayer != null && board.FirstPlayer.Id == WebSecurity.CurrentUserId
                                      ? board.SecondPlayer
                                      : board.FirstPlayer;
             return opponentPlayer;
         }
 
-        public static int GetOpponentId(IGameBoard board)
+        public static int? GetOpponentId(IGameBoard board)
         {
-            return GetOpponentPlayer(board).Id;
+            var opponent = GetOpponent(board);
+            return opponent!= null ? opponent.Id : (int?) null;
         }
 
         public static string GetPlayerName(Player player)
         {
+            if (player == null) return "Computer";
             return player.FullName ?? player.UserName ?? player.Mail;
         }
 
@@ -79,6 +88,13 @@ namespace MailGames.Controllers
                 player = db.Players.First(p => p.UserName == userName);
             }
             return player;
+        }
+
+        public static int GetNumWaitingGames()
+        {
+            if (!WebSecurity.IsAuthenticated) return 0;
+            var gameBoards = FilterPlayerBoards(GameLogic.GetAllBoards(new MailGamesContext())).Where(b => b.WinnerState == null && GameLogic.GetCurrentPlayer(b) == GameLogic.GetLoggedInPlayer(b));
+            return gameBoards.Count();
         }
     }
 }

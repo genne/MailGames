@@ -1,7 +1,4 @@
-﻿.tic-tac-toe-table {
-  margin-bottom: 10px;
-}
-.tic-tac-toe-table td {
+﻿.tic-tac-toe-table td {
   border: 1px solid black;
   text-align: center;
   vertical-align: middle;

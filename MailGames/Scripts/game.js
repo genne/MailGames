@@ -22,6 +22,12 @@ var Game;
             current.addClass("selected");
             activateMoveButton(current.attr("href"));
         });
+
+        $(".code-move-button").click(function (ev) {
+            window.setTimeout(function () {
+                resetMoveButton();
+            });
+        });
     }
     Game.setup = setup;
 })(Game || (Game = {}));

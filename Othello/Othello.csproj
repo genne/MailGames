@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OthelloAI.cs" />
     <Compile Include="OthelloState.cs" />
     <Compile Include="OthelloLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

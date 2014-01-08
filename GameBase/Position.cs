@@ -5,7 +5,7 @@ namespace GameBase
 {
     public class Position
     {
-        private const int IntXMultiplier = 10;
+        private const int DefaultMaxMultiplier = 10;
 
         public static IEnumerable<Position> AllDirections()
         {
@@ -52,19 +52,14 @@ namespace GameBase
             return Equals((Position) obj);
         }
 
-        public Position Add(Position dir)
+        public static Position FromInt(int i, int max = DefaultMaxMultiplier, int min = 0)
         {
-            return new Position(X + dir.X, Y + dir.Y);
+            return new Position(i / max + min, i % max + min);
         }
 
-        public static Position FromInt(int i)
+        public int ToInt(int max = DefaultMaxMultiplier, int min = 0)
         {
-            return new Position(i / IntXMultiplier, i % IntXMultiplier);
-        }
-
-        public int ToInt()
-        {
-            return X*IntXMultiplier + Y;
+            return (X - min) * max + (Y - min);
         }
 
         public Position Move(Move move)
@@ -75,6 +70,11 @@ namespace GameBase
         public override string ToString()
         {
             return "(" + X + "," + Y + ")";
+        }
+
+        public Position Add(Position direction, int multiply = 1)
+        {
+            return new Position(X + direction.X * multiply, Y + direction.Y * multiply);
         }
     }
 }

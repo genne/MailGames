@@ -71,3 +71,7 @@ $(window).resize(function () {
 $(function () {
     updateGrids();
 });
+
+$("select[data-value]").each(function (i, o) {
+    $(o).val($(o).attr("data-value"));
+});

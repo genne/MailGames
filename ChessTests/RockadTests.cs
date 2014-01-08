@@ -28,19 +28,19 @@ namespace ChessTests
         [TestMethod]
         public void TestRockadWhenKingAttacked()
         {
-            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 6), new Piece{ GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.Pawn }));
+            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 6), new Piece(GamePlayer.SecondPlayer, PieceType.Pawn )));
         }
 
         [TestMethod]
         public void TestRockadWhenSpaceAttacked()
         {
-            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 6), new Piece { GamePlayer = GamePlayer.SecondPlayer, PieceType = PieceType.Rook }));
+            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 6), new Piece (GamePlayer.SecondPlayer, PieceType.Rook )));
         }
 
         [TestMethod]
         public void TestRockadWhenOccupied()
         {
-            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 7), new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Knight }));
+            TestRockad(RookRightPos, KingRockadRightPos, false, Tuple.Create(new Position(5, 7), new Piece(GamePlayer.FirstPlayer, PieceType.Knight )));
         }
 
         [TestMethod]
@@ -69,8 +69,8 @@ namespace ChessTests
 
         private static void TestRockad(ChessState state, int rookPos, int kingTargetPos, bool canDoRockad, params Tuple<Position, Piece>[] otherPieces)
         {
-            state.SetCell(rookPos, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Rook });
-            state.SetCell(KingPos, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.King });
+            state.SetCell(rookPos, new Piece(GamePlayer.FirstPlayer, PieceType.Rook));
+            state.SetCell(KingPos, new Piece(GamePlayer.FirstPlayer, PieceType.King));
 
             foreach (var p in otherPieces)
             {
@@ -84,8 +84,8 @@ namespace ChessTests
         public void TestRockadMove()
         {
             var state = new ChessState();
-            state.SetCell(KingPos, new Piece{ GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.King });
-            var rook = new Piece {GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Rook};
+            state.SetCell(KingPos, new Piece(GamePlayer.FirstPlayer, PieceType.King));
+            var rook = new Piece(GamePlayer.FirstPlayer, PieceType.Rook);
             state.SetCell(RookRightPos, rook);
             ChessLogic.ApplyMove(state, KingPos, KingRockadRightPos, null);
             int rookRightPosAfterRockad = new Position(5, 7).ToInt();

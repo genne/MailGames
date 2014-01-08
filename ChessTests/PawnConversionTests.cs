@@ -18,7 +18,7 @@ namespace ChessTests
             var state = new ChessState();
             var @from = new Position(0, 1).ToInt();
             var to = new Position(0, 0).ToInt();
-            state.SetCell(from, new Piece{ GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Pawn});
+            state.SetCell(from, new Piece(GamePlayer.FirstPlayer, PieceType.Pawn));
             const PieceType pawnConversion = PieceType.Rook;
             ChessLogic.ApplyMove(state, from, to, pawnConversion);
 
@@ -32,7 +32,7 @@ namespace ChessTests
             var state = new ChessState();
             var @from = new Position(0, 1).ToInt();
             var to = new Position(0, 0).ToInt();
-            state.SetCell(from, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Pawn });
+            state.SetCell(from, new Piece(GamePlayer.FirstPlayer, PieceType.Pawn));
             ChessLogic.ApplyMove(state, from, to, null);
         }
 
@@ -43,7 +43,7 @@ namespace ChessTests
             var state = new ChessState();
             var @from = new Position(0, 1).ToInt();
             var to = new Position(0, 0).ToInt();
-            state.SetCell(from, new Piece { GamePlayer = GamePlayer.FirstPlayer, PieceType = PieceType.Rook });
+            state.SetCell(from, new Piece(GamePlayer.FirstPlayer, PieceType.Rook ));
             const PieceType pawnConversion = PieceType.Rook;
             ChessLogic.ApplyMove(state, from, to, pawnConversion);
         }

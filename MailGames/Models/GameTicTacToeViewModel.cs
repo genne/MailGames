@@ -1,6 +1,5 @@
 ﻿using GameBase;
 using MailGames.Context;
-using TicTacToe;
 
 namespace MailGames.Models
 {
@@ -10,7 +9,7 @@ namespace MailGames.Models
         {
         }
 
-        public TicTacToeColor?[,] Colors { get; set; }
+        public GamePlayer?[,] Colors { get; set; }
 
         public Position LastMove { get; set; }
     }

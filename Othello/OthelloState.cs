@@ -23,6 +23,12 @@ namespace Othello
             }
         }
 
+        public OthelloState(OthelloState state)
+        {
+            _cells = new Dictionary<Position, GamePlayer>(state._cells);
+            CurrentPlayer = state.CurrentPlayer;
+        }
+
         public GamePlayer CurrentPlayer { get; set; }
 
         public GamePlayer? Get(Position position)

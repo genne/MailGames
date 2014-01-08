@@ -15,6 +15,13 @@ namespace GameBaseTests
         }
 
         [TestMethod]
+        public void TestPositionToFromIntNegative()
+        {
+            var pos = new Position(-1, -1);
+            Assert.AreEqual(pos, Position.FromInt(pos.ToInt(1, -1), 1, -1));
+        }
+
+        [TestMethod]
         public void TestRankingWhenTie()
         {
             Assert.AreEqual(0, RankingLogic.GetRankingUpdateWhenTie(1500, 1500));

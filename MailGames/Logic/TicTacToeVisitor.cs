@@ -85,5 +85,17 @@ namespace MailGames.Logic
         {
             db.TicTacToeBoards.Remove(_ticTacToeBoard);
         }
+
+        public void MoveAI()
+        {
+            var ai = new TicTacToeAI(1);
+            var bestMove = ai.GetRandomBestMove(TicTacToeConversion.GetState(_ticTacToeBoard));
+            _ticTacToeBoard.Moves.Add(new TicTacToeMove
+            {
+                DateTime = DateTime.Now,
+                X = bestMove.X,
+                Y = bestMove.Y
+            });
+        }
     }
 }

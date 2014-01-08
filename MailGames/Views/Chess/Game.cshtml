@@ -6,26 +6,6 @@
     Layout = "~/Views/Shared/_Game.cshtml";
 }
 
-@functions
-{
-
-    static string FormatChessPosition(Position position)
-    {
-        return FormatColPosition(position.X) + FormatRowPosition(position.Y);
-    }
-
-    private static string FormatRowPosition(int y)
-    {
-        return (8 - y).ToString();
-    }
-
-    private static string FormatColPosition(int x)
-    {
-        return ((char)((int)'A' + x)).ToString();
-    }
-
-}
-
 @{
     var dontRotateBoard = Model.Board.PlayerColor == GamePlayer.FirstPlayer;
 }
@@ -55,14 +35,14 @@
                     }
                 </td>
             }
-            <td class="position-id code-exclude-grid">@FormatRowPosition(row)</td>
+            <td class="position-id code-exclude-grid">@ChessLogic.FormatRowPosition(row)</td>
         </tr>
     }
     <tr>
         @for (int origCol = 0; origCol < 8; origCol++)
         {
             var col = dontRotateBoard ? origCol : 7 - origCol;
-            <td class="position-id code-exclude-grid">@FormatColPosition(col)</td>
+            <td class="position-id code-exclude-grid">@ChessLogic.FormatColPosition(col)</td>
         }
     </tr>
 </table>
@@ -134,7 +114,7 @@
         {
             <tr>
                 <td>
-                    @FormatChessPosition(move.From)
+                    @ChessLogic.FormatChessPosition(move.From)
                         <b class="
                             piece 
                             piece-@move.Piece.PieceType.ToString().ToLower() 
@@ -143,7 +123,7 @@
 
                 </td>
                 <td>
-                    @FormatChessPosition(move.To)
+                    @ChessLogic.FormatChessPosition(move.To)
                     @if (move.CapturedPiece != null)
                     {
                         <b class="

@@ -1,5 +1,6 @@
 ﻿@model StartGameHomeViewModel
 
+@using MailGames
 @using MailGames.Controllers
 @using MailGames.Logic
 @using MailGames.Models
@@ -19,8 +20,10 @@
     </div>
     <div class="form-group">
         <label for="playedOpponent">Friend</label>
-        <select name="playedOpponent" class="form-control">
+        <select name="playedOpponent" class="form-control" data-value="@Request.QueryString["playedOpponent"]">
             <option value="">[enter mail]</option>
+            <option value="@Constants.OpponentComputerId" id="computer-opponent">Computer</option>
+            <option value="@Constants.OpponentRandomPlayerId">Random player</option>
             @foreach (var friends in Model.PlayedOpponents.GroupBy(p => p.FriendType).OrderBy(p => p.Key))
             {
                 <optgroup label="@friends.Key">

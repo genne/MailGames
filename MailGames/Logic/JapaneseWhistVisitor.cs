@@ -78,5 +78,10 @@ namespace MailGames.Logic
         {
             db.JapaneseWhistBoards.Remove(_japaneseWhistBoard);
         }
+
+        public void MoveAI()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -13,6 +13,15 @@ namespace MailGames.Context
         public string FullName { get; set; }
 
         public virtual ICollection<PlayerGameRanking> Rankings { get; set; }
+        public virtual ICollection<WaitingGame> WaitingGames { get; set; }
+    }
+
+    public class WaitingGame
+    {
+        public int Id { get; set; }
+        public GameType GameType { get; set; }
+        public Guid GameId { get; set; }
+        public DateTime DateTime { get; set; }
     }
 
     public class PlayerGameRanking

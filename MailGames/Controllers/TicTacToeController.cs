@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using GameBase;
@@ -8,7 +9,7 @@ using MailGames.Context;
 using MailGames.Filters;
 using MailGames.Logic;
 using MailGames.Models;
-using TicTacToe;
+using StackExchange.Profiling;
 using WebMatrix.WebData;
 
 namespace MailGames.Controllers
@@ -21,7 +22,7 @@ namespace MailGames.Controllers
         {
             var board = new MailGamesContext().TicTacToeBoards.Find(id);
             var state = TicTacToeConversion.GetState(board);
-            var colors = new TicTacToeColor?[state.Width,state.Height];
+            var colors = new GamePlayer?[state.Width, state.Height];
             for (int x = 0; x < state.Width; x++)
             {
                 for (int y = 0; y < state.Height; y++)
@@ -34,6 +35,7 @@ namespace MailGames.Controllers
                 Colors = colors,
                 LastMove = ToPosition(board.Moves.LastOrDefault())
             };
+
             return View(model);
         }
 
@@ -51,24 +53,14 @@ namespace MailGames.Controllers
             state.Play(x, y);
             board.Moves.Add(new TicTacToeMove
             {
-                X = x, 
+                X = x,
                 Y = y,
                 DateTime = DateTime.Now
             });
 
-            GameLogic.UpdateWinnerState(board);
+            SendOpponentMail(db, board);
 
             db.SaveChanges();
-
-            if (board.WinnerState.HasValue)
-            {
-                if (board.WinnerState != WinnerState.Tie)
-                    SendOpponentMail(db, board, "You lost the game", "Game lost :(");
-                else
-                    SendOpponentMail(db, board, "It was a tie...", "Tie");
-            }
-            else
-                SendOpponentMail(db, board, "It's your turn to make a move!", "Your turn");
 
             return RedirectToAction("Game", new {id});
         }

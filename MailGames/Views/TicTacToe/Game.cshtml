@@ -16,7 +16,7 @@
                 <td class="@(new Position(x, y).Equals(Model.LastMove) ? "last-move" : "")">
                     @if (color.HasValue)
                     {
-                        @color.Value
+                        @(color.Value == GamePlayer.FirstPlayer ? "X" : "O")
                     }
                     else if (Model.State == GameState.YourTurn)
                     {

@@ -31,7 +31,9 @@ namespace Chess
 
         public Piece GetCell(int cell)
         {
-            return Cells.ContainsKey(cell) ? Cells[cell] : null;
+            Piece piece;
+            Cells.TryGetValue(cell, out piece);
+            return piece;
         }
 
         public Piece GetCell(Position move)
@@ -70,7 +72,7 @@ namespace Chess
 
         public void SetCell(int row, int col, GamePlayer GamePlayer, PieceType pieceType)
         {
-            SetCell(new Position(col, row).ToInt(), new Piece{ GamePlayer = GamePlayer, PieceType = pieceType});
+            SetCell(new Position(col, row).ToInt(), new Piece(GamePlayer, pieceType));
         }
 
         public void AddMove(Piece piece, int @from, int to, Piece capturedPiece)
@@ -83,21 +85,10 @@ namespace Chess
                 CapturedPiece = capturedPiece
             });
         }
-    }
 
-    public class Piece
-    {
-        public PieceType PieceType { get; set; }
-        public GamePlayer GamePlayer { get; set; }
-    }
-
-    public enum PieceType
-    {
-        Pawn,
-        Knight,
-        Bishop,
-        Rook,
-        Queen,
-        King
+        public void SetCell(string cell, GamePlayer player, PieceType pieceType)
+        {
+            SetCell(ChessLogic.ParseChessPosition(cell).ToInt(), new Piece(player, pieceType));
+        }
     }
 }
