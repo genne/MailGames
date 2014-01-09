@@ -51,8 +51,12 @@ namespace ChessTests
             AddKings(state);
             state.SetCell("a2", GamePlayer.FirstPlayer, PieceType.Pawn);
             state.SetCell("b4", GamePlayer.SecondPlayer, PieceType.Pawn);
+            ChessLogic.ApplyMove(state, "e1", "e2", null);
+            ChessLogic.ApplyMove(state, "e8", "e7", null);
             ChessLogic.ApplyMove(state, "a2", "a4", null);
             ChessLogic.ValidateMove(state, "b4", "a3", null, validateTarget: true);
+            ChessLogic.ApplyMove(state, "b4", "a3", null);
+            Assert.IsNull(state.GetCell("a4"));
         }
 
         private void AddKings(ChessState state)

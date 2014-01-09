@@ -16,7 +16,7 @@ namespace MailGames.Controllers
         protected void SendOpponentMail(IGameBoard gameBoard)
         {
             var opponent = PlayerManager.GetOpponent(gameBoard);
-            if (opponent.Mail == null) return;
+            if (opponent == null || opponent.Mail == null) return;
             if (!opponent.WaitingGames.Any())
             {
                 var message = new MailMessage(new MailAddress("noreply@mailgames.azurewebsites.net", "Mail Games"), new MailAddress(opponent.Mail, opponent.FullName));

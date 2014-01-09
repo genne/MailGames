@@ -178,7 +178,7 @@ namespace Chess
 
         private static bool IsEnPassant(ChessState state, Position targetPos)
         {
-            var lastMove = state.Moves.LastOrDefault();
+            var lastMove = state.LastMoves.FirstOrDefault();
             if (lastMove == null) return false;
             var yDir = GetPawnDir(lastMove.Piece.GamePlayer);
             return lastMove.Piece.PieceType == PieceType.Pawn
@@ -367,6 +367,16 @@ namespace Chess
                 piece = new Piece(piece.GamePlayer, pawnConversion.Value);
             }
             var capturedPiece = state.GetCell(to);
+            var targetPos = Position.FromInt(to);
+            if (IsEnPassant(state, targetPos))
+            {
+                var capturedPawnPosition = targetPos.Add(new Position(0, GetPawnDir(GameBaseLogic.GetNextPlayer(piece.GamePlayer))));
+                capturedPiece =
+                    state.GetCell(
+                        capturedPawnPosition);
+                if (capturedPiece == null) throw new InvalidOperationException("En passant, but no pawn captured");
+                state.SetCell(capturedPawnPosition.ToInt(), null);
+            }
             if (capturedPiece != null && capturedPiece.PieceType == PieceType.King) throw new InvalidOperationException("Can't capture king, game should end. From=" + from + " to=" + to + " FromType=" + piece.PieceType + " CurrentPlayer=" + state.CurrentPlayer);
             state.SetCell(to, piece);
             state.SetCell(@from, null);

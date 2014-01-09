@@ -7,11 +7,10 @@ $(".code-nice-date").each(function (i, e) {
     }
     var d = Date.parse(dateString);
     var serverTime = Date.parse($("body").attr("data-servertime"));
-    var now = new Date().getTime();
-    var serverTimeDiff = serverTime - now;
+    var serverTimeDiff = serverTime - Date.now();
 
     var update = function () {
-        var diff = now - d + serverTimeDiff;
+        var diff = Date.now() - d + serverTimeDiff;
 
         var suffix = "ago";
         if (diff < 0) {
@@ -70,8 +69,8 @@ $(window).resize(function () {
 });
 $(function () {
     updateGrids();
-});
 
-$("select[data-value]").each(function (i, o) {
-    $(o).val($(o).attr("data-value"));
+    $("select[data-value]").each(function (i, o) {
+        $(o).val($(o).attr("data-value")).change();
+    });
 });

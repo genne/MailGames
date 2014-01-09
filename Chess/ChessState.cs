@@ -11,13 +11,13 @@ namespace Chess
 
         public List<Piece> CapturedPieces { get; set; }
 
-        public LinkedList<PieceMove> Moves { get; set; }
+        public LinkedList<PieceMove> LastMoves { get; set; }
 
         public ChessState()
         {
             Cells = new Dictionary<int, Piece>();
             CapturedPieces= new List<Piece>();
-            Moves = new LinkedList<PieceMove>();
+            LastMoves = new LinkedList<PieceMove>();
         }
 
         public ChessState(ChessState state)
@@ -25,7 +25,7 @@ namespace Chess
             Cells = new Dictionary<int, Piece>(state.Cells);
             CurrentPlayer = state.CurrentPlayer;
             CapturedPieces = new List<Piece>(state.CapturedPieces);
-            Moves = new LinkedList<PieceMove>(state.Moves);
+            LastMoves = new LinkedList<PieceMove>(state.LastMoves);
             _movedPositions = new List<Position>(state._movedPositions);
         }
 
@@ -77,7 +77,7 @@ namespace Chess
 
         public void AddMove(Piece piece, int @from, int to, Piece capturedPiece)
         {
-            Moves.AddFirst(new PieceMove
+            LastMoves.AddFirst(new PieceMove
             {
                 Piece = piece, 
                 From = Position.FromInt(from), 
@@ -89,6 +89,11 @@ namespace Chess
         public void SetCell(string cell, GamePlayer player, PieceType pieceType)
         {
             SetCell(ChessLogic.ParseChessPosition(cell).ToInt(), new Piece(player, pieceType));
+        }
+
+        public Piece GetCell(string cell)
+        {
+            return GetCell(ChessLogic.ParseChessPosition(cell));
         }
     }
 }
