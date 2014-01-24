@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web;
 using MailGames.Context;
@@ -13,7 +14,7 @@ namespace MailGames.Controllers
     {
         public static Player GetCurrent(MailGamesContext db)
         {
-            return db.Players.Single(p => p.UserName == HttpContext.Current.User.Identity.Name);
+            return db.Players.Single(p => p.UserName == WebSecurity.CurrentUserName);
         }
 
         public static IEnumerable<IGameBoard> FilterPlayerBoards(IEnumerable<IGameBoard> allBoards)
@@ -23,6 +24,8 @@ namespace MailGames.Controllers
 
         public static Player FindOrCreatePlayer(MailGamesContext db, string mail)
         {
+            if (mail == null) throw new ArgumentNullException("mail");
+            if (mail == "") throw new ArgumentException("mail cannot be empty string", "mail");
             return db.Players.FirstOrDefault(p => p.Mail == mail) ?? CreatePlayer(db, mail);
         }
 

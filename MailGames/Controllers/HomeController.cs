@@ -42,13 +42,15 @@ namespace MailGames.Controllers
                 }
             }).ToArray();
             var player = PlayerManager.GetCurrent(db);
-            player.WaitingGames.Clear();
+            player.PendingGamesMailSent = null;
             db.SaveChanges();
             return View(new IndexHomeViewModel
             {
                 UserName = PlayerManager.GetPlayerName(player),
-                YourTurnGames = games.Where(g => !g.Finished && g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
-                OpponentTurnGames = games.Where(g => !g.Finished && !g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
+                YourTurnGames =
+                    games.Where(g => !g.Finished && g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
+                OpponentTurnGames =
+                    games.Where(g => !g.Finished && !g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
                 FinishedGames = games.Where(g => g.Finished).Select(g => g.Game).OrderByDescending(g => g.LastActive),
                 UserId = player.Id
             });
@@ -80,14 +82,14 @@ namespace MailGames.Controllers
             var model = new StartGameHomeViewModel();
             model.PlayedOpponents =
                 PlayerManager.FilterPlayerBoards(GameLogic.GetAllBoards(new MailGamesContext()))
-                    .SelectMany(b => new[] {b.FirstPlayer, b.SecondPlayer})
-                    .Where(p => p != null && p.FullName != null && p.Id != WebSecurity.CurrentUserId)
-                    .Distinct().Select(p => new StartGameHomeViewModel.Friend
-                    {
-                        Id = p.Id,
-                        Name = p.FullName,
-                        FriendType = StartGameHomeViewModel.FriendType.Opponent
-                    }).ToArray();
+                             .SelectMany(b => new[] {b.FirstPlayer, b.SecondPlayer})
+                             .Where(p => p != null && p.Id != WebSecurity.CurrentUserId)
+                             .Distinct().Select(p => new StartGameHomeViewModel.Friend
+                             {
+                                 Id = p.Id,
+                                 Name = p.FullName ?? p.Mail,
+                                 FriendType = StartGameHomeViewModel.FriendType.Opponent
+                             }).ToArray();
             var facebookFriends = FacebookApi.Friends();
             if (facebookFriends != null)
             {
@@ -115,7 +117,9 @@ namespace MailGames.Controllers
             }
             else if (playedOpponent == Constants.OpponentRandomPlayerId)
             {
-                var players = db.Players.Where(p => p.Id != WebSecurity.CurrentUserId && p.Rankings.Any(r => r.GameType == gameType)).ToArray();
+                var players =
+                    db.Players.Where(
+                        p => p.Id != WebSecurity.CurrentUserId && p.Rankings.Any(r => r.GameType == gameType)).ToArray();
                 int randomId = new Random().Next(players.Length);
                 opponent = players[randomId];
             }
@@ -157,10 +161,11 @@ namespace MailGames.Controllers
                 SendOpponentMail(db, board);
             }
             db.SaveChanges();
-            return RedirectToAction("Game", GameLogic.GetController(board), new { id = board.Id });
+            return RedirectToAction("Game", GameLogic.GetController(board), new {id = board.Id});
         }
 
-        private bool ParseFriendId(string playedOpponent, out StartGameHomeViewModel.FriendType friendType, out long friendId, out string name)
+        private bool ParseFriendId(string playedOpponent, out StartGameHomeViewModel.FriendType friendType,
+                                   out long friendId, out string name)
         {
             var split = playedOpponent.Split('_');
             if (split.Length != 2)
@@ -172,7 +177,8 @@ namespace MailGames.Controllers
             }
             friendId = long.Parse(split[0]);
             var split2 = split[1].Split('|');
-            friendType = (StartGameHomeViewModel.FriendType)Enum.Parse(typeof(StartGameHomeViewModel.FriendType), split2[0]);
+            friendType =
+                (StartGameHomeViewModel.FriendType) Enum.Parse(typeof (StartGameHomeViewModel.FriendType), split2[0]);
             name = split2[1];
             return true;
         }
@@ -191,7 +197,7 @@ namespace MailGames.Controllers
             {
                 opponentsMail = opponent != null ? opponent.Mail : null;
             }
-            return RedirectToAction("StartGame", new { opponentsMail, gameType, playedOpponent });
+            return RedirectToAction("StartGame", new {opponentsMail, gameType, playedOpponent});
         }
 
         public ActionResult RemindOpponent(Guid id, GameType gametype)
@@ -223,9 +229,9 @@ namespace MailGames.Controllers
             }
             db.SaveChanges();
 
-            return activity == Activity.GameNeverStarted 
-                ? RedirectToAction("Index")
-                : RedirectToAction("Game", GameLogic.GetController(gametype), new{ id });
+            return activity == Activity.GameNeverStarted
+                       ? RedirectToAction("Index")
+                       : RedirectToAction("Game", GameLogic.GetController(gametype), new {id});
         }
 
         public ActionResult Surrender(Guid id, GameType gameType)
@@ -233,7 +239,9 @@ namespace MailGames.Controllers
             var db = new MailGamesContext();
             var board = GameLogic.GetBoard(db, id, gameType);
             var currentPlayer = GameLogic.EnsurePlayersTurn(board);
-            board.WinnerState = currentPlayer == GamePlayer.FirstPlayer ? WinnerState.FirstPlayerResigned : WinnerState.SecondPlayerResigned;
+            board.WinnerState = currentPlayer == GamePlayer.FirstPlayer
+                                    ? WinnerState.FirstPlayerResigned
+                                    : WinnerState.SecondPlayerResigned;
 
             GameLogic.UpdateRankings(board);
 
@@ -241,33 +249,49 @@ namespace MailGames.Controllers
 
             SendOpponentMail(board);
 
-            return RedirectToAction("Game", GameLogic.GetController(gameType), new { id });
+            return RedirectToAction("Game", GameLogic.GetController(gameType), new {id});
         }
 
         public ActionResult User(int id)
         {
             var db = new MailGamesContext();
-            var boards = GameLogic.GetAllBoards(db).Where(b => 
-                b.WinnerState.HasValue && b.FirstPlayer != null && b.SecondPlayer != null && 
-                    (b.FirstPlayer.Id == id || b.SecondPlayer.Id == id)
+            var boards = GameLogic.GetAllBoards(db).Where(b =>
+                                                          b.WinnerState.HasValue && b.FirstPlayer != null &&
+                                                          b.SecondPlayer != null &&
+                                                          (b.FirstPlayer.Id == id || b.SecondPlayer.Id == id)
                 ).Select(b => new
                 {
                     GameType = GameLogic.GetGameType(b),
-                    FirstPlayerId = b.FirstPlayer != null ? b.FirstPlayer.Id : (int?)null,
+                    FirstPlayerId = b.FirstPlayer != null ? b.FirstPlayer.Id : (int?) null,
                     WinnerState = b.WinnerState
                 }).ToArray();
-            var player1States = new[]{ WinnerState.FirstPlayer, WinnerState.SecondPlayerPassive, WinnerState.SecondPlayerResigned };
-            var player2States = new[]{WinnerState.SecondPlayer, WinnerState.FirstPlayerPassive, WinnerState.FirstPlayerResigned};
+            var player1States = new[]
+            {WinnerState.FirstPlayer, WinnerState.SecondPlayerPassive, WinnerState.SecondPlayerResigned};
+            var player2States = new[]
+            {WinnerState.SecondPlayer, WinnerState.FirstPlayerPassive, WinnerState.FirstPlayerResigned};
             var model = db.Players.Where(p => p.Id == id).ToArray().Select(p => new UserHomeViewModel
             {
+                Id = p.Id,
                 Guid = p.Guid,
                 Name = PlayerManager.GetPlayerName(p),
                 GameRankings = p.Rankings.Select(r => new UserHomeViewModel.GameRanking
                 {
                     GameType = r.GameType,
                     Ranking = r.Ranking,
-                    NumLost = boards.Count(g => g.GameType == r.GameType && (g.FirstPlayerId == id ? player2States.Contains(g.WinnerState.Value) : player1States.Contains(g.WinnerState.Value))),
-                    NumWon = boards.Count(g => g.GameType == r.GameType && (g.FirstPlayerId == id ? player1States.Contains(g.WinnerState.Value) : player2States.Contains(g.WinnerState.Value))),
+                    NumLost =
+                        boards.Count(
+                            g =>
+                            g.GameType == r.GameType &&
+                            (g.FirstPlayerId == id
+                                 ? player2States.Contains(g.WinnerState.Value)
+                                 : player1States.Contains(g.WinnerState.Value))),
+                    NumWon =
+                        boards.Count(
+                            g =>
+                            g.GameType == r.GameType &&
+                            (g.FirstPlayerId == id
+                                 ? player1States.Contains(g.WinnerState.Value)
+                                 : player2States.Contains(g.WinnerState.Value))),
                     NumTie = boards.Count(g => g.GameType == r.GameType && g.WinnerState == WinnerState.Tie),
                 })
             }).Single();
@@ -283,20 +307,48 @@ namespace MailGames.Controllers
                 {
                     Id = p.Id,
                     Name = p.FullName,
-                    Ranking = (float?)p.Rankings.FirstOrDefault(r => r.GameType == gametype).Ranking ?? 0
+                    Ranking = (float?) p.Rankings.FirstOrDefault(r => r.GameType == gametype).Ranking ?? 0
                 }).Where(p => p.Ranking != 0 && p.Name != null).OrderByDescending(p => p.Ranking)
             };
             return View(model);
         }
-    }
 
-    public class TicTacToeQueries
-    {
-        public static IQueryable<TicTacToeBoard> Boards(MailGamesContext db)
+        [AllowAnonymous]
+        public ActionResult SendPendingGamesMailes()
         {
-            return
-                db.TicTacToeBoards.Where(
-                    b => b.FirstPlayer.Id == WebSecurity.CurrentUserId || b.SecondPlayer.Id == WebSecurity.CurrentUserId);
+            MailGamesContext db = new MailGamesContext();
+            var numSend = 0;
+            var numFailures = 0;
+            foreach (var board in GameLogic.GetAllBoards(db).Where(b => b.WinnerState == null))
+            {
+
+                try
+                {
+                    SendOpponentMail(GameLogic.GetCurrentPlayer(board) == GamePlayer.FirstPlayer
+                                         ? board.FirstPlayer
+                                         : board.SecondPlayer);
+                    db.SaveChanges();
+                    numSend++;
+                }
+                catch (Exception)
+                {
+                    numFailures++;
+                    throw;
+                }
+            }
+
+            return Content("Num send: " + numSend + " Num failed: " + numFailures);
+        }
+
+        public static string GenerateFriendValue(long id, StartGameHomeViewModel.FriendType friendType, string name)
+        {
+            return id + "_" + friendType + "|" + name;
+        }
+
+        public static string GeneratePlayerFriendValue(int id)
+        {
+            Player player = new MailGamesContext().Players.Find(id);
+            return GenerateFriendValue(player.Id, StartGameHomeViewModel.FriendType.Opponent, player.FullName);
         }
     }
 }

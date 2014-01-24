@@ -31,7 +31,7 @@
                     {
                         <option 
                             data-fb-id="@(friend.FriendType == StartGameHomeViewModel.FriendType.Facebook ? friend.Id.ToString() : "")"
-                            value="@(friend.Id + "_" + friend.FriendType + "|" + friend.Name)">
+                            value="@HomeController.GenerateFriendValue(friend.Id, friend.FriendType, friend.Name)">
                             @friend.Name
                         </option>
                     }

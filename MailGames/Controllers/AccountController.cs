@@ -275,7 +275,6 @@ namespace MailGames.Controllers
                 var userName = OAuthWebSecurity.GetUserName(providerName, providerUserId);
                 player = db.Players.First(p => p.UserName == userName);
                 player.Mail = mail;
-                player.UserName = mail;
             }
             else
             {

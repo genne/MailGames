@@ -16,22 +16,29 @@ namespace MailGames.Controllers
         protected void SendOpponentMail(IGameBoard gameBoard)
         {
             var opponent = PlayerManager.GetOpponent(gameBoard);
-            if (opponent == null || opponent.Mail == null) return;
-            if (!opponent.WaitingGames.Any())
-            {
-                var message = new MailMessage(new MailAddress("noreply@mailgames.azurewebsites.net", "Mail Games"), new MailAddress(opponent.Mail, opponent.FullName));
-                message.Subject = "Pending games";
-                var loginUrl = Url.Action("LoginUsingGuid", "Account", new { opponent.Guid }, Request.Url.Scheme);
-                message.Body = string.Format("Hello {0},\r\n\r\nYou've got pending games waiting for you. Click this link to login:\r\n\r\n{1}", PlayerManager.GetPlayerName(opponent), loginUrl);
-                new SmtpClient().Send(message);
-            }
+            SendOpponentMail(opponent);
+        }
 
-            opponent.WaitingGames.Add(new WaitingGame
+        protected void SendOpponentMail(Player opponent)
+        {
+            if (opponent == null || opponent.Mail == null) return;
+            if (opponent.PendingGamesMailSent == null ||
+                opponent.PendingGamesMailSent < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
             {
-                GameType = GameLogic.GetGameType(gameBoard),
-                GameId = gameBoard.Id,
-                DateTime = DateTime.Now
-            });
+                var @from = new MailAddress("noreply@mailgames.azurewebsites.net", "Mail Games");
+                var to = new MailAddress(opponent.Mail, opponent.FullName);
+                var loginUrl = Url.Action("LoginUsingGuid", "Account", new {opponent.Guid}, Request.Url.Scheme);
+                var message = new MailMessage(@from, to)
+                {
+                    Subject = "Pending games",
+                    Body =
+                        string.Format(
+                            "Hello {0},\r\n\r\nYou've got pending games waiting for you. Click this link to login:\r\n\r\n{1}",
+                            PlayerManager.GetPlayerName(opponent), loginUrl)
+                };
+                new SmtpClient().Send(message);
+                opponent.PendingGamesMailSent = DateTime.Now;
+            }
         }
 
         protected void SendOpponentMail(MailGamesContext db, IGameBoard board)

@@ -63,6 +63,9 @@
     <Reference Include="Facebook">
       <HintPath>..\packages\Facebook.6.4.2\lib\net45\Facebook.dll</HintPath>
     </Reference>
+    <Reference Include="Kanban.Feedback">
+      <HintPath>..\packages\Kanban.Feedback.1.0.0.0\lib\net45\Kanban.Feedback.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MiniProfiler">
       <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
@@ -347,6 +350,10 @@
     <Compile Include="Migrations\201401041214530_WaitingGames.cs" />
     <Compile Include="Migrations\201401041214530_WaitingGames.Designer.cs">
       <DependentUpon>201401041214530_WaitingGames.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201401191041111_WaitingGamesToPendingGamesMailSent.cs" />
+    <Compile Include="Migrations\201401191041111_WaitingGamesToPendingGamesMailSent.Designer.cs">
+      <DependentUpon>201401191041111_WaitingGamesToPendingGamesMailSent.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -655,6 +662,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201401041214530_WaitingGames.resx">
       <DependentUpon>201401041214530_WaitingGames.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201401191041111_WaitingGamesToPendingGamesMailSent.resx">
+      <DependentUpon>201401191041111_WaitingGamesToPendingGamesMailSent.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

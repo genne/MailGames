@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using MailGames.Context;
 
 namespace MailGames.Models
 {
@@ -11,6 +12,8 @@ namespace MailGames.Models
         public Guid Guid { get; set; }
 
         public IEnumerable<GameRanking> GameRankings { get; set; }
+
+        public int Id { get; set; }
 
         public class GameRanking
         {

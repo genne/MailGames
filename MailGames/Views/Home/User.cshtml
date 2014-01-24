@@ -1,4 +1,5 @@
-﻿@using MailGames.Logic
+﻿@using MailGames.Controllers
+@using MailGames.Logic
 @model MailGames.Models.UserHomeViewModel
 
 @{
@@ -29,3 +30,8 @@
         </tr>
     }
 </table>
+
+@if (Model.Id != WebSecurity.CurrentUserId)
+{
+    <a href="@Url.Action("StartGame", new {playedOpponent = HomeController.GeneratePlayerFriendValue(Model.Id)})" class="btn btn-primary pull-right">Utmana!</a>
+}
