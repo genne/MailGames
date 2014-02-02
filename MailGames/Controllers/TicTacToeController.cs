@@ -20,9 +20,14 @@ namespace MailGames.Controllers
     {
         public ActionResult Game(Guid id)
         {
+            return View(GetModel(id));
+        }
+
+        private static GameTicTacToeViewModel GetModel(Guid id)
+        {
             var board = new MailGamesContext().TicTacToeBoards.Find(id);
             var state = TicTacToeConversion.GetState(board);
-            var colors = new GamePlayer?[state.Width, state.Height];
+            var colors = new GamePlayer?[state.Width,state.Height];
             for (int x = 0; x < state.Width; x++)
             {
                 for (int y = 0; y < state.Height; y++)
@@ -35,8 +40,7 @@ namespace MailGames.Controllers
                 Colors = colors,
                 LastMove = ToPosition(board.Moves.LastOrDefault())
             };
-
-            return View(model);
+            return model;
         }
 
         private static Position ToPosition(TicTacToeMove move)
@@ -62,7 +66,7 @@ namespace MailGames.Controllers
 
             db.SaveChanges();
 
-            return RedirectToAction("Game", new {id});
+            return Json(GetModel(id));
         }
     }
 }

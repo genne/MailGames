@@ -1,7 +1,7 @@
 ﻿using System;
 using MailGames.Context;
 
-namespace MailGames.Controllers
+namespace MailGames.Logic
 {
     public class OthelloQueries
     {

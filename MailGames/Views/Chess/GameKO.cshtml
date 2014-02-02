@@ -1,0 +1,92 @@
+﻿@using Chess
+@model MailGames.Models.ChessGameViewModel
+@{
+    Layout = "~/Views/Shared/_GameKO.cshtml";
+}
+
+<table id="chesstable" class="chess-table code-grid" data-model="@Json.Encode(Model)">
+    <tbody data-bind="foreach: rows">
+    <tr>
+        <!-- ko foreach: cells -->
+        <td data-bind="css: { 'last-move': lastMove, 'available-target': availableTarget, 'selected-target': selectedTarget }, if: piece(), click: selectCell">
+            <b class="piece" data-bind="css: piece().pieceClasses, click: piece().selectPiece, clickBubble: !piece().canSelect"></b>
+        </td>
+        <!-- /ko -->
+        <td class="position-id code-exclude-grid" data-bind="text: rowName"></td>
+    </tr>
+    </tbody>
+    <tr data-bind="foreach: cols">
+        <td class="position-id code-exclude-grid" data-bind="text: colName"></td>
+    </tr>
+</table>
+
+<div class="modal fade" id="pawn-upgrade-modal" data-bind="showModal: upgradePawnMode()">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Select target piece</h4>
+            </div>
+            <div class="modal-body">
+                @foreach (var pieceType in Enum.GetValues(typeof (PieceType)).OfType<PieceType>())
+                {
+                    if (pieceType != PieceType.Pawn && pieceType != PieceType.King)
+                    {
+                        <button type="button" class="btn btn-primary btn-lg code-convert-pawn-button" data-piece-type="@pieceType"><b class="piece-@pieceType.ToString().ToLower()"></b></button>
+                    }
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section moves
+{
+    <h2>Captured pieces</h2>
+    <div data-bind="if: capturedPieces">
+        <div data-bind="foreach: capturedPieces">
+            <b class="piece" data-bind="css: pieceClasses"></b>
+        </div>
+        
+        <div class="current-progress">
+            <div class="progress">
+                <div class="progress-bar progress-bar-danger pull-right" role="progressbar" data-bind="style: { width: dangerProgress() }">
+                </div>
+            </div><div class="progress">
+                      <div class="progress-bar progress-bar-success" role="progressbar" data-bind="style: {width: successProgress() }">
+                      </div>
+                  </div> 
+        </div>
+    </div>
+    <div data-bind="ifnot: capturedPieces">
+        <i>No pieces has been captured yet...</i>
+    </div>
+    
+    <h2>Moves</h2>
+    <table class="table moves-table">
+        <thead><tr><th>From</th><th>To</th></tr></thead>
+        <tbody data-bind="foreach: moves">
+            <tr data-bind="css: { selected: isSelected }">
+                <td>
+                    <span data-bind="text: from"></span>
+                    <b class="piece" data-bind="css: piece.pieceClasses"></b>
+                </td>
+                <td>
+                    <span data-bind="text: to"></span>
+                    <span data-bind="if: capturedPiece">
+                        <b class="piece" data-bind="css: capturedPiece.pieceClasses"></b>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@section scripts
+{
+    <script src="/Scripts/chess.js"></script>
+}

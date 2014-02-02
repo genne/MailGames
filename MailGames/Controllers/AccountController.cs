@@ -8,6 +8,7 @@ using DotNetOpenAuth.AspNet;
 using Facebook;
 using MailGames.Context;
 using MailGames.Filters;
+using MailGames.Logic;
 using MailGames.Models;
 using Microsoft.Web.WebPages.OAuth;
 using WebMatrix.WebData;

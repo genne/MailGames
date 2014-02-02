@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Web;
 using MailGames.Context;
-using MailGames.Logic;
 using Microsoft.Web.WebPages.OAuth;
 using WebMatrix.WebData;
 
-namespace MailGames.Controllers
+namespace MailGames.Logic
 {
     public class PlayerManager
     {

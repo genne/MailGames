@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Chess;
@@ -13,7 +14,17 @@ namespace MailGames.Models
         {
         }
 
-        public ChessBoardViewModel Board { get; set; }
+        public Piece[,] Cells { get; set; }
+
+        public GamePlayer CurrentColor { get; set; }
+
+        public Guid Id { get; set; }
+
+        public GamePlayer PlayerColor { get; set; }
+
+        public GamePlayer? AttackedKing { get; set; }
+
+        public IEnumerable<int> OpponentMoves { get; set; }
 
         public bool IsCheck { get; set; }
 

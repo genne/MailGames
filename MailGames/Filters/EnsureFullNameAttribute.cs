@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using MailGames.Context;
 using MailGames.Controllers;
+using MailGames.Logic;
 
 namespace MailGames.Filters
 {

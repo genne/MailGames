@@ -53,7 +53,6 @@
 
 .piece-color-secondplayer {
     color: black;
-    //text-shadow: 1px 0px 0px white 0px 1px 0px white;
     .stroke(lighten(gray, 10%));
 }
 .piece-color-firstplayer {
@@ -63,6 +62,25 @@
 
 .chess-table {
     margin-bottom: 20px;
+
+    tr:nth-child(even) {
+        td:not(.position-id):nth-child(even) {
+            background-color: lightgrey;
+        }
+
+        td:not(.position-id):nth-child(odd) {
+            background-color: darkgrey;
+        }
+    }
+    tr:nth-child(odd) {
+        td:not(.position-id):nth-child(odd) {
+            background-color: lightgrey;
+        }
+
+        td:not(.position-id):nth-child(even) {
+            background-color: darkgrey;
+        }
+    }
 
     td:not(.position-id) {
         border: 1px solid black;
@@ -85,21 +103,13 @@
             }
         }
 
-        &.cell-white {
-            background-color: lightgrey;
-        }
-
-        &.cell-black {
-            background-color: darkgrey;
-        }
-
         &.available-target {
-            background: lightblue;
+            background: lightblue !important;
             cursor: pointer;
         }
 
         &.selected-target {
-            background: lightgreen;
+            background: lightgreen !important;
         }
     }
 
@@ -124,5 +134,20 @@
         {
             border-radius: 0px 4px 4px 0px;
         }
+    }
+}
+
+.moves-table {
+    tbody tr.selected {
+        background: aliceblue;
+    }
+
+    tbody tr
+    {
+        cursor: pointer;
+    }
+
+    tbody tr:hover {
+        background: aliceblue;
     }
 }

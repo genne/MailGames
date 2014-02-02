@@ -22,27 +22,6 @@ namespace MailGames.Controllers
         //
         // GET: /Chess/
 
-        private ChessBoardViewModel GetBoardViewModel(ChessBoard board)
-        {
-            var state = ChessConversion.GetCurrentState(board);
-            var model = new ChessBoardViewModel();
-            model.Id = board.Id;
-            model.CurrentColor = state.CurrentPlayer;
-            model.PlayerColor = GameLogic.GetLoggedInPlayer(board);
-            bool check = ChessLogic.IsCheck(state, state.CurrentPlayer);
-            model.AttackedKing = check
-                                     ? state.CurrentPlayer
-                                     : (GamePlayer?) null;
-            model.OpponentMoves = board.ChessMoves.Reverse().Take(1).SelectMany(m => new[] {m.From, m.To}).ToArray();
-            model.Cells = new Piece[8,8];
-            foreach(var cellState in state.GetCells())
-            {
-                var pos = Position.FromInt(cellState.Key);
-                model.Cells[pos.X, pos.Y] = cellState.Value;
-            }
-            return model;
-        }
-
         public JsonResult GetAvailableCells(Guid board, int selected)
         {
             var db = new MailGamesContext();
@@ -53,20 +32,41 @@ namespace MailGames.Controllers
 
         public ActionResult Game(Guid id)
         {
+            var model = GetViewModel(id);
+            return View("GameKO", model);
+        }
+
+        private static ChessGameViewModel GetViewModel(Guid id)
+        {
             var db = new MailGamesContext();
             var board = ChessQueries.Find(db, id);
             var state = ChessConversion.GetCurrentState(board);
-            return View(new ChessGameViewModel(board)
+            var state1 = ChessConversion.GetCurrentState(board);
+            var check = ChessLogic.IsCheck(state1, state1.CurrentPlayer);
+            var model = new ChessGameViewModel(board)
             {
                 IsCheck = board.Check,
                 CapturedPieces = state.CapturedPieces,
                 Moves = state.LastMoves,
-                Board = GetBoardViewModel(board),
                 Progress = ChessLogic.GetProgress(state, GameLogic.GetLoggedInPlayer(board)),
-            });
+                Id = board.Id,
+                CurrentColor = state1.CurrentPlayer,
+                PlayerColor = GameLogic.GetLoggedInPlayer(board),
+                AttackedKing = check
+                                   ? state1.CurrentPlayer
+                                   : (GamePlayer?) null,
+                OpponentMoves = board.ChessMoves.Reverse().Take(1).SelectMany(m => new[] {m.From, m.To}).ToArray(),
+                Cells = new Piece[8,8],
+            };
+            foreach (var cellState in state1.GetCells())
+            {
+                var pos = Position.FromInt(cellState.Key);
+                model.Cells[pos.X, pos.Y] = cellState.Value;
+            }
+            return model;
         }
 
-        public ActionResult Move(Guid board, int from, int to, PieceType? convertPawnTo)
+        public JsonResult Move(Guid board, int from, int to, PieceType? convertPawnTo)
         {
             var db = new MailGamesContext();
             var boardObj = ChessQueries.Find(db, board);
@@ -90,7 +90,7 @@ namespace MailGames.Controllers
 
             db.SaveChanges();
 
-            return RedirectToAction("Game", new {id = board});
+            return Json(GetViewModel(board));
         }
     }
 

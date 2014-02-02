@@ -3,27 +3,27 @@
 @using TicTacToe
 @model MailGames.Models.GameTicTacToeViewModel
 @{
-    Layout = "~/Views/Shared/_Game.cshtml";
+    Layout = "~/Views/Shared/_GameKO.cshtml";
 }
 
-<table class="tic-tac-toe-table code-grid" data-width="@Model.Colors.GetLength(0)">
+<table id="tictactoeboard" class="tic-tac-toe-table code-grid" data-width="@Model.Colors.GetLength(0)" data-model="@Json.Encode(Model)">
     @for (int y = 0; y < Model.Colors.GetLength(1); y++)
     {
         <tr>
             @for (int x = 0; x < Model.Colors.GetLength(0); x++)
             {
-                var color = Model.Colors[x, y];
-                <td class="@(new Position(x, y).Equals(Model.LastMove) ? "last-move" : "")">
-                    @if (color.HasValue)
-                    {
-                        @(color.Value == GamePlayer.FirstPlayer ? "X" : "O")
-                    }
-                    else if (Model.State == GameState.YourTurn)
-                    {
-                        <a href="@Url.Action("Select", new{ Model.Id, x, y})"></a>
-                    }
+                <!-- ko with: getCell(@x, @y) -->
+                <td data-bind="css: { 'last-move': lastmove }">
+                    <span data-bind="text: player() == GamePlayer.FirstPlayer ? 'X' : 'O', visible: player() != null"></span>
+                    <a href="@Url.Action("Select", new{ Model.Id, x, y})" data-bind="visible: $root.state() == GameState.YourTurn && player() == null"></a>
                 </td>
+                <!-- /ko -->
             }
         </tr>
     }
 </table>
+
+@section scripts
+{
+    <script src="/Scripts/tictactoe.js"></script>
+}

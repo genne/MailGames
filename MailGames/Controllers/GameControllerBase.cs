@@ -25,7 +25,7 @@ namespace MailGames.Controllers
             if (opponent.PendingGamesMailSent == null ||
                 opponent.PendingGamesMailSent < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
             {
-                var @from = new MailAddress("noreply@mailgames.azurewebsites.net", "Mail Games");
+                var @from = new MailAddress("noreply@christiangenne.com", "Mail Games");
                 var to = new MailAddress(opponent.Mail, opponent.FullName);
                 var loginUrl = Url.Action("LoginUsingGuid", "Account", new {opponent.Guid}, Request.Url.Scheme);
                 var message = new MailMessage(@from, to)

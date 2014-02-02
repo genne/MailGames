@@ -299,13 +299,13 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ChessController.cs" />
     <Compile Include="Context\MailGamesContext.cs" />
-    <Compile Include="Controllers\ChessQueries.cs" />
+    <Compile Include="Logic\ChessQueries.cs" />
     <Compile Include="Controllers\JapaneseWhistController.cs" />
     <Compile Include="Controllers\OthelloController.cs" />
-    <Compile Include="Controllers\FacebookApi.cs" />
+    <Compile Include="Logic\FacebookApi.cs" />
     <Compile Include="Controllers\GameControllerBase.cs" />
-    <Compile Include="Controllers\OthelloConversion.cs" />
-    <Compile Include="Controllers\OthelloQueries.cs" />
+    <Compile Include="Logic\OthelloConversion.cs" />
+    <Compile Include="Logic\OthelloQueries.cs" />
     <Compile Include="Logic\Utils.cs" />
     <Compile Include="Filters\EnsureFullNameAttribute.cs" />
     <Compile Include="Logic\ChessBoardVisitor.cs" />
@@ -357,7 +357,7 @@
     </Compile>
     <Compile Include="Models\GameType.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\PlayerManager.cs" />
+    <Compile Include="Logic\PlayerManager.cs" />
     <Compile Include="Controllers\TicTacToeController.cs" />
     <Compile Include="Migrations\201311031052188_TicTacToeMigration.cs" />
     <Compile Include="Migrations\201311031052188_TicTacToeMigration.Designer.cs">
@@ -402,7 +402,6 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\ChessBoardViewModel.cs" />
     <Compile Include="Models\ChessGameViewModel.cs" />
     <Compile Include="Models\IndexHomeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -428,7 +427,14 @@
       <DependentUpon>variables.less</DependentUpon>
     </Content>
     <Content Include="Scripts\chess.js" />
+    <Content Include="Scripts\knockout-3.0.0.debug.js" />
+    <Content Include="Scripts\knockout-3.0.0.js" />
+    <TypeScriptCompile Include="Scripts\tictactoe.ts" />
+    <Content Include="Scripts\tictactoe.js" />
+    <Content Include="Scripts\typings\knockout\knockout.d.ts" />
     <Content Include="Views\Account\LoginFacebook.cshtml" />
+    <Content Include="Views\Chess\GameKO.cshtml" />
+    <Content Include="Views\Shared\_GameKO.cshtml" />
     <TypeScriptCompile Include="Scripts\game.ts" />
     <Content Include="Scripts\game.js" />
     <TypeScriptCompile Include="Scripts\startgame.ts" />
@@ -467,7 +473,6 @@
     <Content Include="Scripts\typings\jquery\jquery.d.ts" />
     <Content Include="Views\Chess\Index.cshtml" />
     <Content Include="Views\Chess\Game.cshtml" />
-    <Content Include="Views\Chess\_Board.cshtml" />
     <Content Include="Views\Home\_GameList.cshtml" />
     <Content Include="Views\TicTacToe\Game.cshtml" />
     <Content Include="Views\Home\StartGame.cshtml" />
@@ -544,8 +549,6 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\knockout-2.2.0.debug.js" />
-    <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

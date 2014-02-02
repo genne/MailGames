@@ -3,7 +3,7 @@ using System.Linq;
 using MailGames.Context;
 using WebMatrix.WebData;
 
-namespace MailGames.Controllers
+namespace MailGames.Logic
 {
     public class ChessQueries
     {

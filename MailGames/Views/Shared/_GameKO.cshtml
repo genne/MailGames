@@ -1,0 +1,110 @@
+﻿@using GameBase
+@using MailGames.Controllers
+@using MailGames.Logic
+@using MailGames.Models
+@model MailGames.Models.GameViewModel
+@{
+    ViewBag.Title = GameLogic.GetName(Model.GameType);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>
+    @GameLogic.GetName(Model.GameType) 
+    <small>
+        against 
+        @if (Model.OpponentId.HasValue)
+        {
+            <a href="@Url.Action("User", "Home", new {Id = Model.OpponentId})">@Model.OpponentName</a>
+        }
+        else
+        {
+            @Model.OpponentName
+        }
+        <a href="http://en.wikipedia.org/wiki/@GameLogic.GetWikipediaId(Model.GameType)" target="help"><b class="glyphicon glyphicon-question-sign"></b></a>
+    </small>
+</h1>
+<div class="row game-@Model.GameType.ToString().ToLower()" style="display: none" data-bind="visible: true">
+    <div class="col-md-6">
+        <div data-bind="if: state() == GameState.OpponentsTurn">
+            <div class="jumbotron" data-bind="visible: opponentActivity() == Activity.Passive">
+                <b class="glyphicon glyphicon-time"></b>
+                <p>It's been a while since your opponent made a move, send a reminder?</p>
+                <p><a href="@Url.Action("RemindOpponent", "Home", new {Model.Id, Model.GameType})" class="btn btn-primary btn-lg">Send reminder</a></p>
+            </div>
+            <div class="jumbotron" data-bind="visible: opponentActivity() == Activity.PassiveLostGame">
+                <b class="glyphicon glyphicon-time"></b>
+                <p>Since your opponent didn't make any move after the reminder, you may as well win the game!</p>
+                <a href="@Url.Action("RemindOpponent", "Home", new {Model.Id, Model.GameType})" class="btn btn-success btn-lg">Win game!</a>
+            </div>
+            <div class="jumbotron" data-bind="visible: opponentActivity() == Activity.GameNeverStarted">
+                <b class="glyphicon glyphicon-time"></b>
+                <p>It seems like your opponent won't be playing this game at all, remove game from list?</p>
+                <a href="@Url.Action("RemindOpponent", "Home", new {Model.Id, Model.GameType})" class="btn btn-warning btn-lg">Remove game</a>
+            </div>
+        </div>
+        <!-- ko if: !gameOver() -->
+            <div class="pull-right">
+                <a data-bind="visible: state() == GameState.YourTurn" href="#surrender-modal" data-toggle="modal">Surrender</a>
+            </div>
+        
+            <p data-bind="text: state() == GameState.YourTurn ? 'Time to make a move!' : 'Waiting for opponent...'"></p>
+        <!-- /ko -->
+        
+        <div style="clear: both"></div>
+        
+        <div class="jumbotron" data-bind="visible: gameOver">
+            <div data-bind="switch: state">
+                <!-- ko case: GameState.PlayerWon -->
+                <b class="glyphicon glyphicon-star"></b>
+                <h1>You won!</h1>
+                <p>Well played, you won the game!</p>
+                <!-- /ko -->
+                <!-- ko case: GameState.OpponentWon -->
+                <b class="glyphicon glyphicon-thumbs-down"></b>
+                <h1>You lost</h1>
+                <p>Perhaps time for a revenge?</p>
+                <!-- /ko -->
+                <!-- ko case: GameState.Tie -->
+                <b class="glyphicon glyphicon-thumbs-down"></b>
+                <h1>Tie</h1>
+                <p>At least your opponent didn't win...</p>
+                <!-- /ko -->
+            </div>
+            <p style=""><a href="@Url.Action("Rematch", "Home", new {Model.Id, Model.GameType})" class="btn btn-primary btn-lg">Rematch</a></p>
+        </div>
+        
+        <div class="code-use-move-button">
+            @RenderBody()
+        </div>
+        
+        <a href="#" data-bind="visible: state() == GameState.YourTurn" class="btn btn-block btn-lg btn-primary disabled code-move-button" style="margin-top: 10px;">PLAY</a>
+
+    </div>
+    
+    <div class="col-md-6">
+        @RenderSection("moves", false)
+    </div>
+</div>
+
+<div class="modal fade" id="surrender-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Really surrender?</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to surrender this game?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <a href="@Url.Action("Surrender", "Home", new {Model.Id, Model.GameType})" class="btn btn-warning">Surrender</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    @RenderSection("scripts", false)
+}

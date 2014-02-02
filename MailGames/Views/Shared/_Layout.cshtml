@@ -2,10 +2,6 @@
 @using MailGames.Logic
 @using StackExchange.Profiling
 
-@{
-    var numWaitingGames = PlayerManager.GetNumWaitingGames();
-}
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -17,7 +13,7 @@
         <link href="/Content/less/site.less" rel="stylesheet"/>
     </head>
     <body data-servertime="@(DateTime.Now)">
-        <div class="navbar navbar-inverse">
+        <div id="header" class="navbar navbar-inverse">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -26,11 +22,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/">Mail Games 
-                        @if (numWaitingGames > 0)
-                        {
-                            <span class="badge">@numWaitingGames</span>
-
-                        }
+                        <span class="badge" data-bind="text: numWaitingGames, visible: numWaitingGames"></span>
                     </a>
                 </div>
                 @if (User.Identity.IsAuthenticated)
@@ -61,6 +53,7 @@
         @Scripts.Render("~/bundles/modernizr")
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/bootstrap")
+        @Scripts.Render("~/bundles/knockout")
         
         <div id="fb-root"></div>
         <script>

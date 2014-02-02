@@ -350,5 +350,10 @@ namespace MailGames.Controllers
             Player player = new MailGamesContext().Players.Find(id);
             return GenerateFriendValue(player.Id, StartGameHomeViewModel.FriendType.Opponent, player.FullName);
         }
+
+        public int NumWaitingGames()
+        {
+            return PlayerManager.GetNumWaitingGames();
+        }
     }
 }

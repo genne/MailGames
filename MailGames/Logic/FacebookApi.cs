@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Routing;
 using Facebook;
-using MailGames.Models;
 
-namespace MailGames.Controllers
+namespace MailGames.Logic
 {
     public class FacebookApi
     {

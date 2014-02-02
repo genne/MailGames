@@ -2,7 +2,7 @@
 using MailGames.Context;
 using Othello;
 
-namespace MailGames.Controllers
+namespace MailGames.Logic
 {
     public class OthelloConversion
     {
