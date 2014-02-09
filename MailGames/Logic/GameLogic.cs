@@ -115,19 +115,13 @@ namespace MailGames.Logic
         public static Activity GetActivity(IGameBoard gameBoard)
         {
             var lastMove = GetLastActive(gameBoard);
-            if (!lastMove.HasValue) return Activity.Active;
+            var notEnoughMoves = GetVisitor(gameBoard).GetActivityDates().Count() < 2;
+            if (notEnoughMoves) return Activity.GameNeverStarted;
             var lastReminded = gameBoard.LastReminded;
             var lastActiveDate = lastReminded.HasValue && lastReminded.Value > lastMove ? lastReminded.Value : lastMove;
             var passive = DateTime.Now - lastActiveDate > PassivityDuration;
             if (!passive) return Activity.Active;
-            if (gameBoard.LastReminded.HasValue)
-            {
-                var notEnoughMoves = GetVisitor(gameBoard).GetActivityDates().Count() < 2;
-                return notEnoughMoves 
-                    ? Activity.GameNeverStarted 
-                    : Activity.PassiveLostGame;
-            }
-            return Activity.Passive;
+            return gameBoard.LastReminded.HasValue ? Activity.PassiveLostGame : Activity.Passive;
         }
 
         public static string GetName(GameType type)

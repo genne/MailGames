@@ -1,4 +1,4 @@
-﻿.last-move {
+.last-move {
   position: relative;
 }
 .last-move:after {
@@ -12,14 +12,7 @@
   border-radius: 2px;
 }
 .code-use-move-button a.selected {
-  border: 1px solid black;
-}
-.code-use-move-button a.selected:after {
-  background: white;
-  opacity: 0.5;
-}
-.tic-tac-toe-table {
-  margin-bottom: 10px;
+  box-shadow: 0px 0px 6px black;
 }
 .tic-tac-toe-table td {
   border: 1px solid black;
@@ -29,6 +22,9 @@
 .tic-tac-toe-table td a {
   display: block;
   height: 100%;
+  box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
 }
 @font-face {
   font-family: 'Chess';
@@ -93,6 +89,18 @@
 .chess-table {
   margin-bottom: 20px;
 }
+.chess-table tr:nth-child(even) td:not(.position-id):nth-child(even) {
+  background-color: lightgrey;
+}
+.chess-table tr:nth-child(even) td:not(.position-id):nth-child(odd) {
+  background-color: darkgrey;
+}
+.chess-table tr:nth-child(odd) td:not(.position-id):nth-child(odd) {
+  background-color: lightgrey;
+}
+.chess-table tr:nth-child(odd) td:not(.position-id):nth-child(even) {
+  background-color: darkgrey;
+}
 .chess-table td:not(.position-id) {
   border: 1px solid black;
   text-align: center;
@@ -108,18 +116,12 @@
 .chess-table td:not(.position-id) .piece.selectable.selected {
   text-shadow: -1px -1px 0 #00016a, 1px -1px 0 #00016a, -1px 1px 0 #00016a, 1px 1px 0 #00016a;
 }
-.chess-table td:not(.position-id).cell-white {
-  background-color: lightgrey;
-}
-.chess-table td:not(.position-id).cell-black {
-  background-color: darkgrey;
-}
 .chess-table td:not(.position-id).available-target {
-  background: lightblue;
+  background: lightblue !important;
   cursor: pointer;
 }
 .chess-table td:not(.position-id).selected-target {
-  background: lightgreen;
+  background: lightgreen !important;
 }
 .chess-table .position-id {
   text-align: center;
@@ -137,6 +139,15 @@
 }
 .current-progress .progress:last-child {
   border-radius: 0px 4px 4px 0px;
+}
+.moves-table tbody tr.selected {
+  background: aliceblue;
+}
+.moves-table tbody tr {
+  cursor: pointer;
+}
+.moves-table tbody tr:hover {
+  background: aliceblue;
 }
 .othello-board td {
   border: 1px solid black;
@@ -162,6 +173,12 @@
 .othello-board td .player-secondplayer {
   background: black;
   border-radius: 50%;
+}
+.othello-board.player-firstplayer a.selected {
+  background: white;
+}
+.othello-board.player-secondplayer a.selected {
+  background: black;
 }
 .hidden-cards,
 .visible-cards {
@@ -380,4 +397,8 @@
 }
 .friend-list span {
   display: none;
+}
+a,
+a:hover {
+  color: #929292;
 }

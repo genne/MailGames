@@ -18,12 +18,13 @@
     </div>
 
     <div class="col-md-4">
-    <h2>Opponents turn</h2>
-    @Html.Partial("_GameList", Model.OpponentTurnGames)
+        <h2>Finished games</h2>
+        @Html.Partial("_GameList", Model.FinishedGames)
+    </div>
+    
+    <div class="col-md-4">
+        <h2>Opponents turn</h2>
+        @Html.Partial("_GameList", Model.OpponentTurnGames)
     </div>
 
-    <div class="col-md-4">
-    <h2>Finished games</h2>
-    @Html.Partial("_GameList", Model.FinishedGames)
-    </div>
 </div>

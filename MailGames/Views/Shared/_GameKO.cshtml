@@ -44,7 +44,8 @@
         </div>
         <!-- ko if: !gameOver() -->
             <div class="pull-right">
-                <a data-bind="visible: state() == GameState.YourTurn" href="#surrender-modal" data-toggle="modal">Surrender</a>
+                <a data-bind="visible: state() == GameState.YourTurn && opponentActivity() != Activity.GameNeverStarted" href="#surrender-modal" data-toggle="modal">Surrender</a>
+                <a data-bind="visible: state() == GameState.YourTurn && opponentActivity() == Activity.GameNeverStarted" href="#skip-modal" data-toggle="modal">Skip game</a>
             </div>
         
             <p data-bind="text: state() == GameState.YourTurn ? 'Time to make a move!' : 'Waiting for opponent...'"></p>
@@ -94,11 +95,29 @@
                 <h4 class="modal-title">Really surrender?</h4>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to surrender this game?</p>
+                <p>Are you sure you want to surrender this game? Your rating will decrease.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <a href="@Url.Action("Surrender", "Home", new {Model.Id, Model.GameType})" class="btn btn-warning">Surrender</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="skip-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Really skip game?</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to skip this game?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <a href="@Url.Action("Skip", "Home", new {Model.Id, Model.GameType})" class="btn btn-warning">Skip</a>
             </div>
         </div>
     </div>

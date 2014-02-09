@@ -44,6 +44,7 @@ namespace MailGames.Controllers
             var player = PlayerManager.GetCurrent(db);
             player.PendingGamesMailSent = null;
             db.SaveChanges();
+            DateTime finishedGameEndDate = DateTime.Now.AddDays(-7);
             return View(new IndexHomeViewModel
             {
                 UserName = PlayerManager.GetPlayerName(player),
@@ -51,7 +52,7 @@ namespace MailGames.Controllers
                     games.Where(g => !g.Finished && g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
                 OpponentTurnGames =
                     games.Where(g => !g.Finished && !g.YourTurn).Select(g => g.Game).OrderBy(g => g.LastActive),
-                FinishedGames = games.Where(g => g.Finished).Select(g => g.Game).OrderByDescending(g => g.LastActive),
+                FinishedGames = games.Where(g => g.Finished && g.Game.LastActive >= finishedGameEndDate).Select(g => g.Game).OrderByDescending(g => g.LastActive),
                 UserId = player.Id
             });
         }
@@ -250,6 +251,18 @@ namespace MailGames.Controllers
             SendOpponentMail(board);
 
             return RedirectToAction("Game", GameLogic.GetController(gameType), new {id});
+        }
+
+        public ActionResult Skip(Guid id, GameType gameType)
+        {
+            var db = new MailGamesContext();
+            var board = GameLogic.GetBoard(db, id, gameType);
+            if (GameLogic.GetActivity(board) != Activity.GameNeverStarted) throw new InvalidOperationException("Can't skip game now, game is running");
+            GameLogic.RemoveBoard(db, board);
+
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult User(int id)
