@@ -107,6 +107,10 @@ function getRowsAndColumns(model) {
     return rows;
 }
 
+function getMoveUrl(app) {
+    return "/chess/move?board=" + app.id + "&from=" + app.selectedSource() + "&to=" + app.selectedTarget();
+}
+
 function createRows(model, app) {
     var columns = getRowsAndColumns(model);
     var rows = columns;
@@ -128,7 +132,7 @@ function createRows(model, app) {
                         app.selectedTarget(positionToInt(c, r));
                         app.upgradePawnMode(app.shouldUpgradePawn);
                         if (!app.upgradePawnMode()) {
-                            var moveUrl = "/chess/move?board=" + model.Id + "&from=" + app.selectedSource() + "&to=" + app.selectedTarget();
+                            var moveUrl = getMoveUrl(app);
                             Game.activateMoveButton(moveUrl);
                         }
                     },
@@ -245,6 +249,8 @@ var ChessViewModel = (function (_super) {
     ChessViewModel.prototype.updateModel = function (model) {
         _super.prototype.updateModel.call(this, model);
 
+        this.id = model.Id;
+
         this.playerColor(model.PlayerColor);
         this.currentColor(model.CurrentColor);
 
@@ -259,6 +265,11 @@ var ChessViewModel = (function (_super) {
         this.selectedTarget(null);
         this.selectedSource(null);
         this.availableTargets([]);
+    };
+
+    ChessViewModel.prototype.convertPawnTo = function (convertTo) {
+        this.upgradePawnMode(false);
+        Game.call(getMoveUrl(this) + "&convertPawnTo=" + convertTo);
     };
     return ChessViewModel;
 })(GameViewModel);

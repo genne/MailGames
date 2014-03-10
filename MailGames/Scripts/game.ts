@@ -3,6 +3,9 @@ ko.bindingHandlers["showModal"] = {
         if (valueAccessor()) {
             $(elem).modal("show");
         }
+        else {
+            $(elem).modal("hide");
+        }
     }
 }
 
@@ -31,6 +34,11 @@ module Game {
     export function activateMoveButton(url: string) {
         $(".code-move-button").attr("href", url).removeClass("disabled");
     };
+
+    export function call(url: string) {
+        activateMoveButton(url);
+        $(".code-move-button").click();
+    }
 
     export function resetMoveButton() {
         $(".code-move-button").addClass("disabled").removeAttr("href");

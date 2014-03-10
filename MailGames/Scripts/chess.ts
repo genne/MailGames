@@ -145,6 +145,10 @@ function getRowsAndColumns(model: ChessModel)
     return rows;
 }
 
+function getMoveUrl(app: ChessViewModel) {
+    return "/chess/move?board=" + app.id + "&from=" + app.selectedSource() + "&to=" + app.selectedTarget();
+}
+
 function createRows(model: ChessModel, app: ChessViewModel): Row[] {
     var columns = getRowsAndColumns(model);
     var rows = columns;
@@ -166,7 +170,7 @@ function createRows(model: ChessModel, app: ChessViewModel): Row[] {
                         app.selectedTarget(positionToInt(c, r));
                         app.upgradePawnMode(app.shouldUpgradePawn);
                         if (!app.upgradePawnMode()) {
-                            var moveUrl = "/chess/move?board=" + model.Id + "&from=" + app.selectedSource() + "&to=" + app.selectedTarget();
+                            var moveUrl = getMoveUrl(app);
                             Game.activateMoveButton(moveUrl);
                         }
                     },
@@ -257,6 +261,7 @@ class ChessViewModel extends GameViewModel {
     successProgress;
     playerColor = ko.observable();
     currentColor = ko.observable();
+    id: string;
 
     constructor(model: ChessModel) {
         super();
@@ -275,6 +280,8 @@ class ChessViewModel extends GameViewModel {
     updateModel(model: ChessModel) {
         super.updateModel(model);
 
+        this.id = model.Id;
+
         this.playerColor(model.PlayerColor);
         this.currentColor(model.CurrentColor);
 
@@ -291,6 +298,10 @@ class ChessViewModel extends GameViewModel {
         this.availableTargets([]);
     }
 
+    convertPawnTo(convertTo: number): void {
+        this.upgradePawnMode(false);
+        Game.call(getMoveUrl(this) + "&convertPawnTo=" + convertTo);
+    }
 }
 
 function getPieces(app: ChessViewModel): PieceViewModel[] {
